@@ -1,0 +1,9 @@
+{
+    "name": "etch-a-snake",
+    "description": "HCI Project",
+    "author": "Group 8",
+    "dependencies": {
+        "express": "4.x",
+        "socket.io": "*"
+    }
+}
