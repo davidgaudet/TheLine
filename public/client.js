@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function() {
          pointY = height/2;
          socket.emit('redraw_path');
       }
-      setTimeout(mainLoop, 20);
+      setTimeout(mainLoop, 30);
    }
    mainLoop();
 });
