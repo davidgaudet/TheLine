@@ -9,22 +9,17 @@ var server =  http.createServer(app);
 var io = socketIo.listen(server);
 const PORT = process.env.PORT || 8080;
 server.listen(PORT);
-
-// Directory for static files
 app.use(express.static(__dirname + '/public'));
 console.log("Starting server...");
+
+function wait(time) {
+   return new Promise(resolve => { setTimeout(() => { resolve('resolved'); }, time); });
+}
 
 // The path
 let path = [{x: 0.5, y: 0.5},{x: 0.501, y: 0.501}];
 
-function wait(time) {
-   return new Promise(resolve => {
-      setTimeout(() => {
-         resolve('resolved');
-      }, time);
-   });
-}
-
+// Mutex lock & variables to resolve concurrency issues from simultaneous user moves
 let moveCount = 0;
 let lock = false;
 const EventEmitter = require('events');
@@ -54,7 +49,6 @@ async function handleMove(point) {
    io.emit('draw_line', point);
    return point;
 }
-
 
 // Handle new users connecting
 io.on('connection', function (socket) {
