@@ -1,80 +1,68 @@
 // Client / user / front-end code
 document.addEventListener("DOMContentLoaded", function() {
-   var mouse = { 
+   
+   // Initialize variables for this user
+   var pointX,pointY = 0;
+   var lastMoveTime  = 0;
+   var socket = io.connect();
+   var width  = window.innerWidth;
+   var height = window.innerHeight;
+   var mouse  = { 
       click: false,
-      pos: {x:0, y:0},
-      pos_prev: false
+      pos: {x:0, y:0}
    };
 
    // Create canvas
-   var canvas  = document.getElementById('drawing');
-   var context = canvas.getContext('2d');
-   var width   = window.innerWidth;
-   var height  = window.innerHeight;
-   var socket  = io.connect();
- 
-   // Start with a point in the center
-   var pointX = width/2;
-   var pointY = height/2;
-
-   context.beginPath();
-   context.moveTo(pointX, pointY);
-   context.lineTo(pointX+1, pointY);
-   context.stroke();
-   pointX = pointX + 1;
-
-   // Set canvas to full browser width/height
-   canvas.width = width;
+   var canvas    = document.getElementById('drawing');
+   var context   = canvas.getContext('2d');
+   canvas.width  = width;
    canvas.height = height;
  
+   // Set info for the users move
    canvas.onmousedown = function(e){ 
-      mouse.pos.x = e.clientX / width;
-      mouse.pos.y = e.clientY / height;
-      mouse.click = true; 
+      if ((Date.now() - lastMoveTime) < 2000) return;
+      lastMoveTime = Date.now();
+      mouse.pos.x  = e.clientX / width;
+      mouse.pos.y  = e.clientY / height;
+      mouse.click  = true; 
    };
 
-   // Usage TBD
-   //canvas.onmouseup = function(e) {};
-   //canvas.onmousemove = function(e) {};
- 
-   // Add new line segment received from server
-   socket.on('draw_line', function (data) {
-      var line = data.line;
-      context.moveTo(pointX, pointY);
-      pointX = line[0].x * width;
-      pointY = line[0].y * height;
+   // Add line to new point (extend the path)
+   socket.on('draw_line', function (point) {
+      pointX = point.x * width;
+      pointY = point.y * height;
       context.lineTo(pointX, pointY);
       context.stroke();
    });
-
-   function wait2Seconds() {
-      return new Promise(resolve => {
-         setTimeout(() => {
-            resolve('resolved');
-         }, 2000);
-      });
-   }
+ 
+   // Draw entire path
+   socket.on('draw_path', function (path) {
+      for (var i in path) {
+         pointX = path[i].x * width;
+         pointY = path[i].y * height;
+         context.lineTo(pointX, pointY);
+         context.stroke();
+      }
+   });
 
    // Main loop, runs every 20ms
    async function mainLoop() {
       // Check if the user has clicked to add a line
       if (mouse.click) {
-         // Send line to to the server
-         socket.emit('draw_line', { line: [ mouse.pos, mouse.pos_prev ] });
-         await wait2Seconds(); // Todo: replace this with something that doesn't pause all the clients code
+         // Send point to the server
+         socket.emit('new_click', mouse.pos);
          mouse.click = false;
-      }
-      mouse.pos_prev = {x: mouse.pos.x, y: mouse.pos.y};
+      } 
 
       // Check if user has changed the size of their browser window
       if (window.innerWidth != width || window.innerHeight != height) {
-         width = window.innerWidth;
+         width  = window.innerWidth;
          height = window.innerHeight;
-         canvas.width = width;
+         canvas.width  = width;
          canvas.height = height;
          pointX = width/2;
          pointY = height/2;
-         socket.emit('redraw_line');
+         socket.emit('redraw_path');
       }
       setTimeout(mainLoop, 20);
    }

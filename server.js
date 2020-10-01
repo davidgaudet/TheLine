@@ -12,31 +12,27 @@ server.listen(PORT);
 
 // Directory for static files
 app.use(express.static(__dirname + '/public'));
-console.log("Server running...");
+console.log("Starting server...");
 
 // The path
-var line_history = [];
+var path = [{x: 0.5, y: 0.5},{x: 0.501, y: 0.501}];
 
-// Event-handler for new users connecting
+// Handle new users connecting
 io.on('connection', function (socket) {
 
    // Send the current path to user
-   for (var i in line_history) {
-      socket.emit('draw_line', { line: line_history[i] } );
-   }
+   socket.emit('draw_path', path);
 
    // Resend the path to the user (happens if the user changes their window size)
-   socket.on('redraw_line', function () {
-      for (var i in line_history) {
-         socket.emit('draw_line', { line: line_history[i] } );
-      }
+   socket.on('redraw_path', function () {
+      socket.emit('draw_path', path);
    });
 
-   // Add handler for message type "draw_line".
-   socket.on('draw_line', function (data) {
+   // Handle new click from user.
+   socket.on('new_click', function (point) {
       // Add received line to history 
-      line_history.push(data.line);
+      path.push(point);
       // Send line to all clients
-      io.emit('draw_line', { line: data.line });
+      io.emit('draw_line', point);
    });
 });
