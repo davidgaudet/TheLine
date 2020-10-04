@@ -1,68 +1,63 @@
 // Client / user / front-end code
 document.addEventListener("DOMContentLoaded", function() {
    
-   // Initialize variables for this user
-   var pointX,pointY = 0;
-   var lastMoveTime  = 0;
-   var socket = io.connect();
-   var width  = window.innerWidth;
-   var height = window.innerHeight;
-   var mouse  = { 
+   // Info for this user's UI and state
+   let socket = io.connect();
+   let width  = window.innerWidth;
+   let height = window.innerHeight;
+   let mouse  = { 
       click: false,
       pos: {x:0, y:0}
    };
-
-   // Create canvas
-   var canvas    = document.getElementById('drawing');
-   var context   = canvas.getContext('2d');
+   let moveTime  = 0;   // Clock time when user send a move to the server
+   let pathCopy  = [];  // Users local copy of the path
+   let canvas    = document.getElementById('drawing');
+   let context   = canvas.getContext('2d');
    canvas.width  = width;
    canvas.height = height;
  
-   // Set info for the users move
+   // When the user clicks, store their move info
    canvas.onmousedown = function(e){ 
-      if ((Date.now() - lastMoveTime) < 2000) return;
-      lastMoveTime = Date.now();
+      if ((Date.now() - moveTime) < 2000) return;
+      moveTime = Date.now();
       mouse.pos.x  = e.clientX / width;
       mouse.pos.y  = e.clientY / height;
       mouse.click  = true; 
    };
 
+   // Draw entire path 
+   socket.on('draw_path', function (path) {
+      pathCopy = path;
+      drawPath();
+   });
+   
    // Add line to new point (extend the path)
    socket.on('draw_line', function (point) {
-      pointX = point.x * width;
-      pointY = point.y * height;
-      context.lineTo(pointX, pointY);
-      context.stroke();
-   });
- 
-   // Draw entire path
-   socket.on('draw_path', function (path) {
-      for (var i in path) {
-         pointX = path[i].x * width;
-         pointY = path[i].y * height;
-         context.lineTo(pointX, pointY);
-         context.stroke();
-      }
+      pathCopy.push(point);
+      drawLine(point);
    });
 
-   // Main loop, runs every 20ms
+   // Helper functions for making the actual UI changes
+   function drawPath() { for (let i in pathCopy) drawLine(pathCopy[i]); }
+   function drawLine(point) {
+      context.lineTo(point.x * width, point.y * height);
+      context.stroke();
+   }
+
+   // Main loop, runs every 30ms
    async function mainLoop() {
       // Check if the user has clicked to add a line
-      if (mouse.click) {
-         // Send point to the server
-         socket.emit('new_click', mouse.pos);
+      if (mouse.click) {   
+         socket.emit('new_click', mouse.pos);   // Send point to the server
          mouse.click = false;
       } 
-
       // Check if user has changed the size of their browser window
       if (window.innerWidth != width || window.innerHeight != height) {
          width  = window.innerWidth;
          height = window.innerHeight;
          canvas.width  = width;
          canvas.height = height;
-         pointX = width/2;
-         pointY = height/2;
-         socket.emit('redraw_path');
+         drawPath();
       }
       setTimeout(mainLoop, 30);
    }

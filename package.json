@@ -4,6 +4,6 @@
     "author": "Group 8",
     "dependencies": {
         "express": "4.x",
-        "socket.io": "*"
+        "socket.io": "^2.3.0"
     }
 }
