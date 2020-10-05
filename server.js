@@ -22,7 +22,7 @@ let path = [{x: 0.5, y: 0.5},{x: 0.501, y: 0.501}];
 // Mutex lock & letiables to resolve concurrency issues from simultaneous user moves
 let moveCount = 0;
 let lock = false;
-let shape = [];
+let shapes = [];
 const EventEmitter = require('events');
 const bus = new EventEmitter();
 
@@ -103,7 +103,8 @@ async function handleMove(point) {
 io.on('connection', function (socket) {
 
    // Send the current path to user
-   socket.emit('draw_path', path);
+   //socket.emit('draw_path', path);
+   socket.emit('draw_path_and_shapes', shapes, path);
 
    // Handle new click from user
    socket.on('new_click', async function lockableMoveHandler(point) {
@@ -114,13 +115,10 @@ io.on('connection', function (socket) {
       let result = await handleMove(point);
       if (Array.isArray(result)) {
          let intersect = {x: result[0].x, y: result[0].y};
-         shape = [];
-         shape.push(intersect);
          path.push(intersect);
-         shape.push(path.splice(result[0].index+1, path.length-(result[0].index)));
+         shapes.push(path.splice(result[0].index+1, path.length-(result[0].index)));
          path.push(intersect);
-         io.emit('draw_path', path);
-         // TODO: send 'shape' to clients
+         io.emit('draw_shape', shapes[shapes.length-1], path);
          if (tmpMoveCount == moveCount) {
             lock = false;
             bus.emit('unlocked');
