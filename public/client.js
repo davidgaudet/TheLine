@@ -38,7 +38,13 @@ document.addEventListener("DOMContentLoaded", function() {
    });
 
    // Helper functions for making the actual UI changes
-   function drawPath() { for (let i in pathCopy) drawLine(pathCopy[i]); }
+   function drawPath() { 
+      width  = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width  = width;
+      canvas.height = height;
+      for (let i in pathCopy) drawLine(pathCopy[i]); 
+   }
    function drawLine(point) {
       context.lineTo(point.x * width, point.y * height);
       context.stroke();
@@ -52,13 +58,7 @@ document.addEventListener("DOMContentLoaded", function() {
          mouse.click = false;
       } 
       // Check if user has changed the size of their browser window
-      if (window.innerWidth != width || window.innerHeight != height) {
-         width  = window.innerWidth;
-         height = window.innerHeight;
-         canvas.width  = width;
-         canvas.height = height;
-         drawPath();
-      }
+      if (window.innerWidth != width || window.innerHeight != height) drawPath();
       setTimeout(mainLoop, 30);
    }
    mainLoop();
