@@ -1,13 +1,50 @@
 <!DOCTYPE html>
 <html>
-   <head>
-      <title>TheLine</title>
-      <meta charset="utf-8">
-      <link rel="stylesheet" href="style.css" />
-      <script src="client.js"></script>
-      <script src="socket.io/socket.io.js"></script>
-   </head>
-   <body>
-      <canvas id="drawing"></canvas>
-   </body>
+
+<head>
+  <title>TheLine</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="style.css" />
+  <script src="client.js"></script>
+  <script src="socket.io/socket.io.js"></script>
+  <link rel="stylesheet" type="text/css" href="loading-bar.css" />
+  <script type="text/javascript" src="loading-bar.js"></script>
+</head>
+
+<body>
+  <header>
+    <nav>
+      <li class="logo"><a href="#">The Line</a></li>
+      <ul class="menu">
+        <li class="item"><a href="#">Home</a></li>
+        <li class="item"><a href="#">About</a></li>
+        <li class="item"><a href="#">Gallery</a></li>
+        <li class="item"><a href="#">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+  <canvas id="drawing"></canvas>
+  <footer>
+    <div id="bottom-bar">
+      <div id="project-info">
+        <h1>Tool Bar</h1>
+        <p>Add stuff here later</p>
+      </div>
+      <div id="bar-info">
+        <div class="myBar label-center"></div>
+        <p id="attributes">loading bar by loading.io</h3>
+      </div>
+    </div>
+  </footer>
+  <script>
+    var bar = new ldBar(".myBar", {
+      "stroke": '#09f',
+      "stroke-width": 13,
+      "preset": "fan",
+      "value": 100,
+      "stroke-linecap": "round"
+    });
+  </script>
+</body>
+
 </html>
