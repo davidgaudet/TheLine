@@ -1,10 +1,14 @@
 // Client / user / front-end code
 document.addEventListener("DOMContentLoaded", function() {
 
+  // Game info
+  const HEADER_HEIGHT = 0.08;
+  const CANVAS_HEIGHT = 0.82;
+
   // Info for this user's UI and state
   let socket = io.connect();
   let width = window.innerWidth;
-  let height = window.innerHeight * .82;
+  let height = window.innerHeight * CANVAS_HEIGHT;
   let mouse = {
     click: false,
     pos: {
@@ -27,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function() {
     //Essentially, the y coord click on the screen needs to be offset by the height of the header, because
     // y=0 on the Canvas is actually y=79 on just the screen, but we need to "ignore" the Header
     //which is why I subtract height of header (calculated by getting .08 of screen height) from the click
-    let canvasCoord = e.clientY - (window.innerHeight * .08);
+    let canvasCoord = e.clientY - (window.innerHeight * HEADER_HEIGHT);
     mouse.pos.x = e.clientX / width;
     mouse.pos.y = (canvasCoord) / height;
     //e.clientY is the y coord relative to the screen;
@@ -49,14 +53,6 @@ document.addEventListener("DOMContentLoaded", function() {
     pathCopy = path;
     drawAll();
   });
-
-  // Draw entire path
-  /*
-  socket.on('draw_path', function (path) {
-     pathCopy = path;
-     drawPath();
-  });
-  */
 
   // Add line to new point (extend the path)
   socket.on('draw_line', function(point) {
@@ -99,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function() {
     //Allows for me to add a footer & header, breakdown is that header is
     //.08 of page, footer is .1, rest (the canvas) is .82
     //So I made height equal to 82% of screen's height
-    height = window.innerHeight * .82;
+    height = window.innerHeight * CANVAS_HEIGHT;
     canvas.width = width;
     canvas.height = height;
     drawShapes();
@@ -127,7 +123,10 @@ document.addEventListener("DOMContentLoaded", function() {
     //Allows recharge bar to show current status
     updateRechargeBar();
     // Check if user has changed the size of their browser window
-    if (window.innerWidth != width || window.innerHeight != height) drawAll();
+    if (window.innerWidth != width || window.innerHeight*CANVAS_HEIGHT != height) {
+       console.log("test");
+       drawAll();
+    }
     setTimeout(mainLoop, 30);
   }
   mainLoop();
