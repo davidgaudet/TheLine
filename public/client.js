@@ -123,10 +123,7 @@ document.addEventListener("DOMContentLoaded", function() {
     //Allows recharge bar to show current status
     updateRechargeBar();
     // Check if user has changed the size of their browser window
-    if (window.innerWidth != width || window.innerHeight*CANVAS_HEIGHT != height) {
-       console.log("test");
-       drawAll();
-    }
+    if (window.innerWidth != width || window.innerHeight*CANVAS_HEIGHT != height) drawAll();
     setTimeout(mainLoop, 30);
   }
   mainLoop();
