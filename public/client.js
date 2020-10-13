@@ -1,4 +1,19 @@
 // Client / user / front-end code
+let curColor;
+let shapeColors = [];
+function onColorClick(color) {
+   curColor = color;
+   console.log("%s", color);
+}
+//colors of the rainbow!
+let colors = ['#9400D3', '#4B0082', '#0000FF', '#00FF00', '#FFFF00', '#FF7F00', '#FF0000', 'white', 'black'];
+function changeColor(){
+  var btns = document.getElementsByClassName("button");
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].style.background = colors[i];
+  }
+}
+
 document.addEventListener("DOMContentLoaded", function() {
 
   // Game info
@@ -24,6 +39,9 @@ document.addEventListener("DOMContentLoaded", function() {
   canvas.width = width;
   canvas.height = height;
 
+
+   //document.getElementById("button" + i).style.background=colors[i-1];
+
   // When the user clicks, store their move info
   canvas.onmousedown = function(e) {
     if ((Date.now() - moveTime) < 2000) return;
@@ -48,11 +66,12 @@ document.addEventListener("DOMContentLoaded", function() {
   };
 
   // Draw everything (from scratch)
-  socket.on('draw_path_and_shapes', function(shapesArr, path) {
+  socket.on('draw_path_and_shapes', function (shapesArr, path, colorArr) {
     shapes = shapesArr;
     pathCopy = path;
+    shapeColors = colorArr;
     drawAll();
-  });
+ });
 
   // Add line to new point (extend the path)
   socket.on('draw_line', function(point) {
@@ -61,11 +80,12 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   // Add shape
-  socket.on('draw_shape', function(shape, path) {
+  socket.on('draw_shape', function (shape, path, color) {
     shapes.push(shape);
     pathCopy = path;
-    drawAll();
-  });
+    shapeColors.push(color);
+    drawAll(color);
+ });
 
   // Helper functions for making the actual UI changes
   function drawPath() {
@@ -77,12 +97,14 @@ document.addEventListener("DOMContentLoaded", function() {
     context.stroke();
   }
 
-  function drawShapes() {
-    for (let i in shapes) drawShape(shapes[i]);
-  }
+  function drawShapes() { 
+    for (let i in shapes) {
+       context.fillStyle = shapeColors[i];
+       drawShape(shapes[i]); 
+    }
+ }
 
   function drawShape(shape) {
-    context.fillStyle = 'lightblue';
     context.beginPath();
     context.moveTo(shape[shape.length - 1].x * width, shape[shape.length - 1].y * height);
     for (let i in shape) context.lineTo(shape[i].x * width, shape[i].y * height);
@@ -115,9 +137,11 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   async function mainLoop() {
+    
     // Check if the user has clicked to add a line
+    changeColor();
     if (mouse.click) {
-      socket.emit('new_click', mouse.pos); // Send point to the server
+      socket.emit('new_click', mouse.pos, curColor); // Send point to the server
       mouse.click = false;
     }
     //Allows recharge bar to show current status

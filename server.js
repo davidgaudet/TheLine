@@ -23,6 +23,7 @@ let path = [{x: 0.5, y: 0.5},{x: 0.501, y: 0.501}];
 let moveCount = 0;
 let lock = false;
 let shapes = [];
+let colorArray = [];
 const EventEmitter = require('events');
 const bus = new EventEmitter();
 
@@ -104,10 +105,13 @@ io.on('connection', function (socket) {
 
    // Send the current path to user
    //socket.emit('draw_path', path);
-   socket.emit('draw_path_and_shapes', shapes, path);
+   // for (let i = 1; i < colors.length; i++)
+   // document.getElementById("button" + i).style.background=colors[i-1];
+
+   socket.emit('draw_path_and_shapes', shapes, path, colorArray);
 
    // Handle new click from user
-   socket.on('new_click', async function lockableMoveHandler(point) {
+   socket.on('new_click', async function lockableMoveHandler(point, color) {
       moveCount++;
       if (lock) await new Promise(resolve => bus.once('unlocked', resolve));
       lock = true;
@@ -117,8 +121,9 @@ io.on('connection', function (socket) {
          let intersect = {x: result[0].x, y: result[0].y};
          path.push(intersect);
          shapes.push(path.splice(result[0].index+1, path.length-(result[0].index)));
+         colorArray.push(color);
          path.push(intersect);
-         io.emit('draw_shape', shapes[shapes.length-1], path);
+         io.emit('draw_shape', shapes[shapes.length-1], path, color);
          if (tmpMoveCount == moveCount) {
             lock = false;
             bus.emit('unlocked');
