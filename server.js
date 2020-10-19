@@ -18,16 +18,16 @@ function wait(time) {
 
 // The path
 let path = [{x: 0.5, y: 0.5},{x: 0.501, y: 0.501}];
+let shapes = [];
+let colors = [];
 
 // Mutex lock & letiables to resolve concurrency issues from simultaneous user moves
 let moveCount = 0;
 let lock = false;
-let shapes = [];
-let colorArray = [];
 const EventEmitter = require('events');
 const bus = new EventEmitter();
 
-// Find if the new line (between p1A and p1B) intersects the path somewhere.
+// Find where this line (p1A to p1B) intersects the path, and return the intersect point if it exits.
 function findPathIntersect(p1A, p1B) {
    const len = path.length;
    if (len < 3) return -1;
@@ -58,11 +58,12 @@ function findPathIntersect(p1A, p1B) {
       if (det != 0) {
          let x = (line1*x2 - line2*x1)/det;
          let y = (line2*y1 - line1*y2)/det;
-         if (Math.max(min1x, min2x) < x && x < Math.min(max1x, max2x) &&
-             Math.max(min1y, min2y) < y && y < Math.min(max1y, max2y)) {
+         const E = 0.000000000000001
+         if (Math.max(min1x, min2x) < x + E && x < Math.min(max1x, max2x) + E &&
+             Math.max(min1y, min2y) < y + E && y < Math.min(max1y, max2y) + E) {
             let thisDist = Math.sqrt(Math.pow(x-p1A.x,2)+Math.pow(y-p1A.y,2));
             if (thisDist < result.dist) result = {index: i, dist: thisDist, x: x, y: y};
-         } 
+         }
       }
    }
    if (result.index == -1) return -1;
@@ -72,29 +73,25 @@ function findPathIntersect(p1A, p1B) {
 // Slowly add lines to extend the path
 async function handleMove(point) {
    let tmpMoveCount = moveCount;
-   let tailPoint = path[path.length - 1];
+   let endPoint = path[path.length - 1];
 
-   let iPoint = findPathIntersect(tailPoint, point);
+   let iPoint = findPathIntersect(endPoint, point);
    let oldPoint = {x: point.x, y: point.y};
    if (iPoint != -1) point = {x: iPoint.x, y: iPoint.y};
 
-   let xDist = point.x - tailPoint.x;
-   let yDist = point.y - tailPoint.y;
+   let xDist = point.x - endPoint.x;
+   let yDist = point.y - endPoint.y;
    let nPieces = Math.sqrt(xDist*xDist + yDist*yDist) / 0.01;
    let xInc = xDist / nPieces;
    let yInc = yDist / nPieces;
- 
-   async function addPoint() {
-      if (tmpMoveCount != moveCount) return true;
-      let nextPoint = { x: (tailPoint.x + xInc), y: (tailPoint.y + yInc) };
-      tailPoint = nextPoint;
+   for (let i = 1; i < nPieces; i++) {
+      if (tmpMoveCount != moveCount) return endPoint;
+      let nextPoint = { x: (endPoint.x + xInc), y: (endPoint.y + yInc) };
+      endPoint = nextPoint;
       io.emit('draw_line', nextPoint);
       await wait(200);
-      return false;
    }
-
-   for (let i = 1; i < nPieces; i++) if (await addPoint()) return tailPoint;
-   if (tmpMoveCount != moveCount) return tailPoint;
+   if (tmpMoveCount != moveCount) return endPoint;
    io.emit('draw_line', point);
    if (iPoint != -1) return [iPoint, oldPoint];
    return point;
@@ -103,12 +100,8 @@ async function handleMove(point) {
 // Handle new users connecting
 io.on('connection', function (socket) {
 
-   // Send the current path to user
-   //socket.emit('draw_path', path);
-   // for (let i = 1; i < colors.length; i++)
-   // document.getElementById("button" + i).style.background=colors[i-1];
-
-   socket.emit('draw_path_and_shapes', shapes, path, colorArray);
+   // Send all data to new user connecting
+   socket.emit('draw_path_and_shapes', shapes, path, colors);
 
    // Handle new click from user
    socket.on('new_click', async function lockableMoveHandler(point, color) {
@@ -121,7 +114,7 @@ io.on('connection', function (socket) {
          let intersect = {x: result[0].x, y: result[0].y};
          path.push(intersect);
          shapes.push(path.splice(result[0].index+1, path.length-(result[0].index)));
-         colorArray.push(color);
+         colors.push(color);
          path.push(intersect);
          io.emit('draw_shape', shapes[shapes.length-1], path, color);
          if (tmpMoveCount == moveCount) {
@@ -129,9 +122,7 @@ io.on('connection', function (socket) {
             bus.emit('unlocked');
             return lockableMoveHandler(result[1]);
          }
-      } else {
-         path.push(result);
-      }
+      } else path.push(result);
       lock = false;
       bus.emit('unlocked');
    });
