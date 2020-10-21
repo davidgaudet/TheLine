@@ -17,67 +17,65 @@
   <script src="./js/mouse-click.js"></script>
 </head>
 <style type="text/css">
-  div.clickEffect{
-    position:fixed;
-    box-sizing:border-box;
-    border-style:solid;
-    border-color:#000000;
-    border-radius:50%;
-    animation:clickEffect 0.4s ease-out;
-    z-index:99999;
+  div.clickEffect {
+    position: fixed;
+    box-sizing: border-box;
+    border-style: solid;
+    border-color: #000000;
+    border-radius: 50%;
+    animation: clickEffect 0.4s ease-out;
+    z-index: 99999;
   }
-  @keyframes clickEffect{
-    0%{
-      opacity:1;
-      width:0.5em; height:0.5em;
-      margin:-0.25em;
-      border-width:0.5rem;
+
+  @keyframes clickEffect {
+    0% {
+      opacity: 1;
+      width: 0.5em;
+      height: 0.5em;
+      margin: -0.25em;
+      border-width: 0.5rem;
     }
-    100%{
-      opacity:0.2;
-      width:5em; height:5em;
-      margin:-2.5em;
-      border-width:0.03rem;
+
+    100% {
+      opacity: 0.2;
+      width: 5em;
+      height: 5em;
+      margin: -2.5em;
+      border-width: 0.03rem;
     }
   }
-  </style>
+</style>
 
 <body>
   <header>
-    <nav>
-      <li class="logo"><a href="#">The Line</a></li>
-      <ul class="menu">
-        <li class="item"><a href="#">Home</a></li>
-        <li class="item" onclick="showPopup()"><a href="#">Info</a></li>
-        <li class="item"><a href="#">Gallery</a></li>
-      </ul>
-    </nav>
-  </header>
-  <canvas id="drawing"></canvas>
-  <footer>
-    <div id="bottom-bar">
+    <div id="line-header">
       <div id="project-info">
-        <h1>Tool Bar</h1>
-        <p>Add stuff here later</p>
-        <div id="color-buttons">
-          <button class="button" onclick="onColorClick(colors[0])"></button>
-          <button class="button" onclick="onColorClick(colors[1])"></button>
-          <button class="button" onclick="onColorClick(colors[2])"></button>
-          <button class="button" onclick="onColorClick(colors[3])"></button>
-          <button class="button" onclick="onColorClick(colors[4])"></button>
-          <button class="button" onclick="onColorClick(colors[5])"></button>
-          <button class="button" onclick="onColorClick(colors[6])"></button>
-          <button class="button" onclick="onColorClick(colors[7])"></button>
-          <button class="button" onclick="onColorClick(colors[8])"></button>
-        </div>
+        <h1>The Line</h1>
+        
       </div>
+      <div id="color-buttons">
+        <button class="button" onclick="onColorClick(colors[0])"></button>
+        <button class="button" onclick="onColorClick(colors[1])"></button>
+        <button class="button" onclick="onColorClick(colors[2])"></button>
+        <button class="button" onclick="onColorClick(colors[3])"></button>
+        <button class="button" onclick="onColorClick(colors[4])"></button>
+        <button class="button" onclick="onColorClick(colors[5])"></button>
+        <button class="button" onclick="onColorClick(colors[6])"></button>
+        <button class="button" onclick="onColorClick(colors[7])"></button>
+        <button class="button" onclick="onColorClick(colors[8])"></button>
+      </div>
+
       <div id="bar-info">
         <div class="myBar label-center"></div>
         <p id="attributes">loading bar by loading.io</h3>
       </div>
-    </div>
-  </footer>
 
+    </div>
+
+  </header>
+  <canvas id="drawing"></canvas>
+
+  <!-- Do not display this at the moment
   <div id="popup-shadow" class="hidden"></div>
 
   <div id="popup" class="hidden">
@@ -109,6 +107,7 @@
       </div>
 
   </div>
+<!--  -->
 
   <script>
     var bar = new ldBar(".myBar", {

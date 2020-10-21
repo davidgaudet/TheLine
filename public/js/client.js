@@ -17,8 +17,8 @@ function changeColor(){
 document.addEventListener("DOMContentLoaded", function() {
 
   // Game info
-  const HEADER_HEIGHT = 0.08;
-  const CANVAS_HEIGHT = 0.82;
+  const HEADER_HEIGHT = 0.1;
+  const CANVAS_HEIGHT = 0.9;
 
   // Info for this user's UI and state
   let socket = io.connect();
@@ -97,10 +97,10 @@ document.addEventListener("DOMContentLoaded", function() {
     context.stroke();
   }
 
-  function drawShapes() { 
+  function drawShapes() {
     for (let i in shapes) {
        context.fillStyle = shapeColors[i];
-       drawShape(shapes[i]); 
+       drawShape(shapes[i]);
     }
  }
 
@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   async function mainLoop() {
-    
+
     // Check if the user has clicked to add a line
     changeColor();
     if (mouse.click) {
