@@ -81,7 +81,7 @@ async function handleMove(point) {
 
    let xDist = point.x - endPoint.x;
    let yDist = point.y - endPoint.y;
-   let nPieces = Math.sqrt(xDist*xDist + yDist*yDist) / 0.01;
+   let nPieces = Math.sqrt(xDist*xDist + yDist*yDist) / 0.008;
    let xInc = xDist / nPieces;
    let yInc = yDist / nPieces;
    for (let i = 1; i < nPieces; i++) {

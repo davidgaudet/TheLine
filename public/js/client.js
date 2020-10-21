@@ -1,5 +1,5 @@
 // Client / user / front-end code
-let curColor;
+let curColor = '#9400D3';
 let shapeColors = [];
 function onColorClick(color) {
    curColor = color;
@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // When the user clicks, store their move info
   canvas.onmousedown = function(e) {
-    if ((Date.now() - moveTime) < 2000) return;
+    if ((Date.now() - moveTime) < 6000) return;
     moveTime = Date.now();
     //Essentially, the y coord click on the screen needs to be offset by the height of the header, because
     // y=0 on the Canvas is actually y=79 on just the screen, but we need to "ignore" the Header
@@ -127,8 +127,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
   function updateRechargeBar() {
     let timeLeft = Date.now() - moveTime;
-    let percentage = (timeLeft / 2000) * 100;
-    if (timeLeft <= 2040) {
+    let percentage = (timeLeft / 6000) * 100;
+    if (timeLeft <= 6040) {
       bar.set(
         percentage, /* target value. */
         true /* enable animation. default is true */
