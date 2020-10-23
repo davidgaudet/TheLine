@@ -1,5 +1,5 @@
 // Server code
-let express = require('express'), 
+let express = require('express'),
     app = express(),
     http = require('http'),
     socketIo = require('socket.io');
@@ -76,6 +76,8 @@ async function handleMove(point) {
    let endPoint = path[path.length - 1];
 
    let iPoint = findPathIntersect(endPoint, point);
+
+
    let oldPoint = {x: point.x, y: point.y};
    if (iPoint != -1) point = {x: iPoint.x, y: iPoint.y};
 
@@ -104,7 +106,10 @@ io.on('connection', function (socket) {
    socket.emit('draw_path_and_shapes', shapes, path, colors);
 
    // Handle new click from user
-   socket.on('new_click', async function lockableMoveHandler(point, color) {
+   socket.on('new_click', async function lockableMoveHandler(point, color, isNewMove) {
+      if(isNewMove){
+          io.emit('end_of_line', point);
+      }
       moveCount++;
       if (lock) await new Promise(resolve => bus.once('unlocked', resolve));
       lock = true;
@@ -120,7 +125,7 @@ io.on('connection', function (socket) {
          if (tmpMoveCount == moveCount) {
             lock = false;
             bus.emit('unlocked');
-            return lockableMoveHandler(result[1]);
+            return lockableMoveHandler(result[1], color, false);
          }
       } else path.push(result);
       lock = false;

@@ -1,13 +1,15 @@
 // Client / user / front-end code
 let curColor = '#9400D3';
 let shapeColors = [];
+
 function onColorClick(color) {
-   curColor = color;
-   console.log("%s", color);
+  curColor = color;
+  console.log("%s", color);
 }
 //colors of the rainbow!
 let colors = ['#9400D3', '#4B0082', '#0000FF', '#00FF00', '#FFFF00', '#FF7F00', '#FF0000', 'white', 'black'];
-function changeColor(){
+
+function changeColor() {
   var btns = document.getElementsByClassName("button");
   for (var i = 0; i < btns.length; i++) {
     btns[i].style.background = colors[i];
@@ -40,11 +42,11 @@ document.addEventListener("DOMContentLoaded", function() {
   canvas.height = height;
 
 
-   //document.getElementById("button" + i).style.background=colors[i-1];
+  //document.getElementById("button" + i).style.background=colors[i-1];
 
   // When the user clicks, store their move info
   canvas.onmousedown = function(e) {
-    if ((Date.now() - moveTime) < 6000) return;
+    if ((Date.now() - moveTime) < 1000) return;
     moveTime = Date.now();
     //Essentially, the y coord click on the screen needs to be offset by the height of the header, because
     // y=0 on the Canvas is actually y=79 on just the screen, but we need to "ignore" the Header
@@ -63,15 +65,17 @@ document.addEventListener("DOMContentLoaded", function() {
       false /* enable animation. default is true */
     );
 
+    //clickEffect(e.clientX, e.clientY);
+
   };
 
   // Draw everything (from scratch)
-  socket.on('draw_path_and_shapes', function (shapesArr, path, colorArr) {
+  socket.on('draw_path_and_shapes', function(shapesArr, path, colorArr) {
     shapes = shapesArr;
     pathCopy = path;
     shapeColors = colorArr;
     drawAll();
- });
+  });
 
   // Add line to new point (extend the path)
   socket.on('draw_line', function(point) {
@@ -80,12 +84,32 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   // Add shape
-  socket.on('draw_shape', function (shape, path, color) {
+  socket.on('draw_shape', function(shape, path, color) {
     shapes.push(shape);
     pathCopy = path;
     shapeColors.push(color);
     drawAll(color);
- });
+  });
+
+  // we know where this line is ending (meaning we clicked)
+  //helper function to place click animations????
+  socket.on('end_of_line', function(point) {
+    console.log("Final coord is" + point.x + " " + point.y);
+    clickEffect(point.x  * width, (point.y *  height) + (window.innerHeight * HEADER_HEIGHT));
+  });
+
+
+  function clickEffect(x, y) {
+    console.log("click animation deploying");
+    var d = document.createElement("div");
+    d.className = "clickEffect";
+    d.style.top = y + "px";
+    d.style.left = x + "px";
+    document.body.appendChild(d);
+    d.addEventListener('animationend', function() {
+      d.parentElement.removeChild(d);
+    }.bind(this));
+  }
 
   // Helper functions for making the actual UI changes
   function drawPath() {
@@ -99,10 +123,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
   function drawShapes() {
     for (let i in shapes) {
-       context.fillStyle = shapeColors[i];
-       drawShape(shapes[i]);
+      context.fillStyle = shapeColors[i];
+      drawShape(shapes[i]);
     }
- }
+  }
 
   function drawShape(shape) {
     context.beginPath();
@@ -127,8 +151,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
   function updateRechargeBar() {
     let timeLeft = Date.now() - moveTime;
-    let percentage = (timeLeft / 6000) * 100;
-    if (timeLeft <= 6040) {
+    let percentage = (timeLeft / 1000) * 100;
+    if (timeLeft <= 1040) {
       bar.set(
         percentage, /* target value. */
         true /* enable animation. default is true */
@@ -141,13 +165,13 @@ document.addEventListener("DOMContentLoaded", function() {
     // Check if the user has clicked to add a line
     changeColor();
     if (mouse.click) {
-      socket.emit('new_click', mouse.pos, curColor); // Send point to the server
+      socket.emit('new_click', mouse.pos, curColor, true); // Send point to the server
       mouse.click = false;
     }
     //Allows recharge bar to show current status
     updateRechargeBar();
     // Check if user has changed the size of their browser window
-    if (window.innerWidth != width || window.innerHeight*CANVAS_HEIGHT != height) drawAll();
+    if (window.innerWidth != width || window.innerHeight * CANVAS_HEIGHT != height) drawAll();
     setTimeout(mainLoop, 30);
   }
   mainLoop();
