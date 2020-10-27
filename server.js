@@ -17,9 +17,9 @@ let path = [{x: 0.5, y: 0.5},{x: 0.501, y: 0.501}];
 let shapes = [];
 let colors = [];
 
-// Vars for controlling draw speed
-let LINE_COOLDOWN = 200;  // Time (in milliseconds) between each new point being sent to clients.
-let LINE_SIZE = 0.008;    // The size of each line segment (as a fraction of the height/width of canvas).
+// Consts for controlling draw speed
+const LINE_COOLDOWN = 180;  // Time (in milliseconds) between each new point being sent to clients.
+const LINE_SIZE = 0.008;    // The size of each line segment (as a fraction of the height/width of canvas).
 
 // Mutex lock & variables to resolve concurrency issues from simultaneous user moves
 let lock = false;
@@ -62,6 +62,7 @@ async function mainLoop() {
          shapes.push(path.splice(result[0].index+1, path.length-(result[0].index)));
          colors.push(curMove.color);
          path.push(intersect);
+         await wait(LINE_COOLDOWN);
          io.emit('draw_shape', shapes[shapes.length-1], path, curMove.color);
          if (tmpMoveCount == moveCount && newMoves.length == 0) {
             newMoves.push({ point: result[1], color: curMove.color, isNewMove: false });

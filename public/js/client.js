@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function() {
   // Game info
   const HEADER_HEIGHT = 0.1;
   const CANVAS_HEIGHT = 0.9;
+  const MOVE_COOLDOWN = 1000;
 
   // Info for this user's UI and state
   let socket = io.connect();
@@ -42,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // When the user clicks, store their move info
   canvas.onmousedown = function(e) {
-    if ((Date.now() - moveTime) < 1000) return;
+    if ((Date.now() - moveTime) < MOVE_COOLDOWN) return;
     moveTime = Date.now();
     //Essentially, the y coord click on the screen needs to be offset by the height of the header, because
     // y=0 on the Canvas is actually y=79 on just the screen, but we need to "ignore" the Header
@@ -140,8 +141,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
   function updateRechargeBar() {
     let timeLeft = Date.now() - moveTime;
-    let percentage = (timeLeft / 1000) * 100;
-    if (timeLeft <= 1040) {
+    let percentage = (timeLeft / MOVE_COOLDOWN) * 100;
+    if (timeLeft <= MOVE_COOLDOWN + 40) {
       bar.set(
         percentage, /* target value. */
         true /* enable animation. default is true */
