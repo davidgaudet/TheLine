@@ -12,20 +12,94 @@ server.listen(PORT);
 app.use(express.static(__dirname + '/public'));
 console.log("Starting server...");
 
-function wait(time) {
-   return new Promise(resolve => { setTimeout(() => { resolve('resolved'); }, time); });
-}
-
-// The path
+// State info
 let path = [{x: 0.5, y: 0.5},{x: 0.501, y: 0.501}];
 let shapes = [];
 let colors = [];
 
+// Vars for controlling draw speed
+let LINE_COOLDOWN = 200;  // Time (in milliseconds) between each new point being sent to clients.
+let LINE_SIZE = 0.008;    // The size of each line segment (as a fraction of the height/width of canvas).
+
 // Mutex lock & letiables to resolve concurrency issues from simultaneous user moves
-let moveCount = 0;
 let lock = false;
 const EventEmitter = require('events');
 const bus = new EventEmitter();
+let moveCount = 0;
+let newMoves = [];
+
+// Handle new users connecting
+io.on('connection', function (socket) {
+
+   // Send all data to new user connecting
+   socket.emit('draw_path_and_shapes', shapes, path, colors);
+
+   // Handle new click from user
+   socket.on('new_click', async function lockableMoveHandler(point, color) {
+      moveCount++;
+      let tmpMoveCount = moveCount;
+      io.emit('show_new_click', point);
+      if (lock) await new Promise(resolve => bus.once('unlocked', resolve));
+      if (tmpMoveCount == moveCount && newMoves.length == 0) {
+         lock = true;
+         newMoves.push({ point: point, color: color, isNewMove: true });
+         lock = false;
+         bus.emit('unlocked');
+      }
+   });
+});
+
+async function mainLoop() {
+   if (lock) await new Promise(resolve => bus.once('unlocked', resolve));
+   lock = true;
+   if (newMoves.length != 0) {
+      let tmpMoveCount = moveCount;
+      let curMove = newMoves.shift();
+      let result = await handleMove(curMove.point);
+      if (Array.isArray(result)) {
+         let intersect = {x: result[0].x, y: result[0].y};
+         path.push(intersect);
+         shapes.push(path.splice(result[0].index+1, path.length-(result[0].index)));
+         colors.push(curMove.color);
+         path.push(intersect);
+         io.emit('draw_shape', shapes[shapes.length-1], path, curMove.color);
+         if (tmpMoveCount == moveCount && newMoves.length == 0) {
+            newMoves.push({ point: result[1], color: curMove.color, isNewMove: false });
+         }
+      } else path.push(result);
+   }
+   lock = false;
+   bus.emit('unlocked');
+   setTimeout(mainLoop, 30);
+}
+
+// Slowly add lines to extend the path
+async function handleMove(point) {
+   let tmpMoveCount = moveCount;
+   let endPoint = path[path.length - 1];
+
+   let iPoint = findPathIntersect(endPoint, point);
+
+   let oldPoint = {x: point.x, y: point.y};
+   if (iPoint != -1) point = {x: iPoint.x, y: iPoint.y};
+
+   let xDist = point.x - endPoint.x;
+   let yDist = point.y - endPoint.y;
+   let nPieces = Math.sqrt(xDist*xDist + yDist*yDist) / LINE_SIZE;
+   let xInc = xDist / nPieces;
+   let yInc = yDist / nPieces;
+   for (let i = 1; i < nPieces; i++) {
+      if (tmpMoveCount != moveCount) return endPoint;
+      let nextPoint = { x: (endPoint.x + xInc), y: (endPoint.y + yInc) };
+      endPoint = nextPoint;
+      io.emit('draw_line', nextPoint);
+      await wait(LINE_COOLDOWN);
+   }
+   if (tmpMoveCount != moveCount) return endPoint;
+   io.emit('draw_line', point);
+   if (iPoint != -1) return [iPoint, oldPoint];
+   return point;
+}
 
 // Find where this line (p1A to p1B) intersects the path, and return the intersect point if it exits.
 function findPathIntersect(p1A, p1B) {
@@ -70,65 +144,6 @@ function findPathIntersect(p1A, p1B) {
    return result;
 }
 
-// Slowly add lines to extend the path
-async function handleMove(point) {
-   let tmpMoveCount = moveCount;
-   let endPoint = path[path.length - 1];
+function wait(time) { return new Promise(resolve => { setTimeout(() => { resolve('resolved'); }, time); }); }
 
-   let iPoint = findPathIntersect(endPoint, point);
-
-
-   let oldPoint = {x: point.x, y: point.y};
-   if (iPoint != -1) point = {x: iPoint.x, y: iPoint.y};
-
-   let xDist = point.x - endPoint.x;
-   let yDist = point.y - endPoint.y;
-   let nPieces = Math.sqrt(xDist*xDist + yDist*yDist) / 0.008;
-   let xInc = xDist / nPieces;
-   let yInc = yDist / nPieces;
-   for (let i = 1; i < nPieces; i++) {
-      if (tmpMoveCount != moveCount) return endPoint;
-      let nextPoint = { x: (endPoint.x + xInc), y: (endPoint.y + yInc) };
-      endPoint = nextPoint;
-      io.emit('draw_line', nextPoint);
-      await wait(200);
-   }
-   if (tmpMoveCount != moveCount) return endPoint;
-   io.emit('draw_line', point);
-   if (iPoint != -1) return [iPoint, oldPoint];
-   return point;
-}
-
-// Handle new users connecting
-io.on('connection', function (socket) {
-
-   // Send all data to new user connecting
-   socket.emit('draw_path_and_shapes', shapes, path, colors);
-
-   // Handle new click from user
-   socket.on('new_click', async function lockableMoveHandler(point, color, isNewMove) {
-      if(isNewMove){
-          io.emit('end_of_line', point);
-      }
-      moveCount++;
-      if (lock) await new Promise(resolve => bus.once('unlocked', resolve));
-      lock = true;
-      let tmpMoveCount = moveCount;
-      let result = await handleMove(point);
-      if (Array.isArray(result)) {
-         let intersect = {x: result[0].x, y: result[0].y};
-         path.push(intersect);
-         shapes.push(path.splice(result[0].index+1, path.length-(result[0].index)));
-         colors.push(color);
-         path.push(intersect);
-         io.emit('draw_shape', shapes[shapes.length-1], path, color);
-         if (tmpMoveCount == moveCount) {
-            lock = false;
-            bus.emit('unlocked');
-            return lockableMoveHandler(result[1], color, false);
-         }
-      } else path.push(result);
-      lock = false;
-      bus.emit('unlocked');
-   });
-});
+mainLoop();

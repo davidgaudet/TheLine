@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function() {
   canvas.height = height;
 
 
-  //document.getElementById("button" + i).style.background=colors[i-1];
+  
 
   // When the user clicks, store their move info
   canvas.onmousedown = function(e) {
@@ -64,9 +64,6 @@ document.addEventListener("DOMContentLoaded", function() {
       0, /* target value. */
       false /* enable animation. default is true */
     );
-
-    //clickEffect(e.clientX, e.clientY);
-
   };
 
   // Draw everything (from scratch)
@@ -78,8 +75,17 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   // Add line to new point (extend the path)
-  socket.on('draw_line', function(point) {
+  socket.on('draw_line', async function(point) {
+    let lastPoint = pathCopy[pathCopy.length-1];
+    let xDif = point.x - lastPoint.x;
+    let yDif = point.y - lastPoint.y;
     pathCopy.push(point);
+    drawLine({ x: lastPoint.x + xDif/4, y: lastPoint.y + yDif/4 });
+    await wait(50);
+    drawLine({ x: lastPoint.x + xDif/2, y: lastPoint.y + yDif/2 });
+    await wait(50);
+    drawLine({ x: lastPoint.x + 3*xDif/4, y: lastPoint.y + 3*yDif/4 });
+    await wait(50);
     drawLine(point);
   });
 
@@ -91,13 +97,14 @@ document.addEventListener("DOMContentLoaded", function() {
     drawAll(color);
   });
 
-  // we know where this line is ending (meaning we clicked)
-  //helper function to place click animations????
-  socket.on('end_of_line', function(point) {
+  
+  // Show clicks as they're recieved by server
+  socket.on('show_new_click', function(point) {
     console.log("Final coord is" + point.x + " " + point.y);
     clickEffect(point.x  * width, (point.y *  height) + (window.innerHeight * HEADER_HEIGHT));
   });
-
+  
+  function wait(time) { return new Promise(resolve => { setTimeout(() => { resolve('resolved'); }, time); }); }
 
   function clickEffect(x, y) {
     console.log("click animation deploying");
@@ -161,11 +168,10 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   async function mainLoop() {
-
     // Check if the user has clicked to add a line
     changeColor();
     if (mouse.click) {
-      socket.emit('new_click', mouse.pos, curColor, true); // Send point to the server
+      socket.emit('new_click', mouse.pos, curColor); // Send point to the server
       mouse.click = false;
     }
     //Allows recharge bar to show current status
