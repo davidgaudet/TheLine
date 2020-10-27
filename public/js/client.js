@@ -1,5 +1,5 @@
 // Client / user / front-end code
-let curColor = '#9400D3';
+let curColor = '#cc4125';
 let shapeColors = [];
 
 function onColorClick(color) {
@@ -7,8 +7,7 @@ function onColorClick(color) {
   console.log("%s", color);
 }
 //colors of the rainbow!
-let colors = ['#9400D3', '#4B0082', '#0000FF', '#00FF00', '#FFFF00', '#FF7F00', '#FF0000', 'white', 'black'];
-
+let colors = ['#cc4125', '#e06666', '#f6b26b', '#ffd966', '#93c47d', '#76a5af', '#6fa8dc', '#8e7cc3', '#c27ba0', 'white'];
 function changeColor() {
   var btns = document.getElementsByClassName("button");
   for (var i = 0; i < btns.length; i++) {
@@ -40,9 +39,6 @@ document.addEventListener("DOMContentLoaded", function() {
   let context = canvas.getContext('2d');
   canvas.width = width;
   canvas.height = height;
-
-
-  
 
   // When the user clicks, store their move info
   canvas.onmousedown = function(e) {
@@ -103,20 +99,6 @@ document.addEventListener("DOMContentLoaded", function() {
     console.log("Final coord is" + point.x + " " + point.y);
     clickEffect(point.x  * width, (point.y *  height) + (window.innerHeight * HEADER_HEIGHT));
   });
-  
-  function wait(time) { return new Promise(resolve => { setTimeout(() => { resolve('resolved'); }, time); }); }
-
-  function clickEffect(x, y) {
-    console.log("click animation deploying");
-    var d = document.createElement("div");
-    d.className = "clickEffect";
-    d.style.top = y + "px";
-    d.style.left = x + "px";
-    document.body.appendChild(d);
-    d.addEventListener('animationend', function() {
-      d.parentElement.removeChild(d);
-    }.bind(this));
-  }
 
   // Helper functions for making the actual UI changes
   function drawPath() {
@@ -165,6 +147,20 @@ document.addEventListener("DOMContentLoaded", function() {
         true /* enable animation. default is true */
       );
     }
+  }
+
+  function wait(time) { return new Promise(resolve => { setTimeout(() => { resolve('resolved'); }, time); }); }
+
+  function clickEffect(x, y) {
+    console.log("click animation deploying");
+    var d = document.createElement("div");
+    d.className = "clickEffect";
+    d.style.top = y + "px";
+    d.style.left = x + "px";
+    document.body.appendChild(d);
+    d.addEventListener('animationend', function() {
+      d.parentElement.removeChild(d);
+    }.bind(this));
   }
 
   async function mainLoop() {

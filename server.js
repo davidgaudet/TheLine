@@ -21,7 +21,7 @@ let colors = [];
 let LINE_COOLDOWN = 200;  // Time (in milliseconds) between each new point being sent to clients.
 let LINE_SIZE = 0.008;    // The size of each line segment (as a fraction of the height/width of canvas).
 
-// Mutex lock & letiables to resolve concurrency issues from simultaneous user moves
+// Mutex lock & variables to resolve concurrency issues from simultaneous user moves
 let lock = false;
 const EventEmitter = require('events');
 const bus = new EventEmitter();
