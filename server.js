@@ -11,6 +11,7 @@ const PORT = process.env.PORT || 8080;
 server.listen(PORT);
 app.use(express.static(__dirname + '/public'));
 console.log("Starting server...");
+console.log("Open http://localhost:8080/")
 
 // State info
 let path = [{x: 0.5, y: 0.5},{x: 0.501, y: 0.501}];

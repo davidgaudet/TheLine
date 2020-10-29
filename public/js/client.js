@@ -15,6 +15,11 @@ function changeColor() {
   }
 }
 
+function updateSelectedColor(element) {
+  $(element).siblings().removeClass('selected-color');
+  $(element).addClass('selected-color');
+}
+
 document.addEventListener("DOMContentLoaded", function() {
 
   // Game info
