@@ -37,11 +37,8 @@ $(document).ready(function(){
             if (clickedText == 'Intro') {
                 $('div#popup-intro-div').removeClass('hidden');
             }
-            else if (clickedText == 'Mechanics'){
+            else{
                 $('div#popup-help-div').removeClass('hidden');
-            }
-            else {
-                $('div#popup-contact-div').removeClass('hidden');
             }
         }
     }, 'ul#popup-list li:not(.popup-selected)');

@@ -72,7 +72,7 @@ ul#popup-list {
 
 ul#popup-list li {
     float: left;
-    width: calc(100% / 3);
+    width: 50%;
     height: 100%;
     display: block;
     box-sizing: border-box;
