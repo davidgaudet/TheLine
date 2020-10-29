@@ -18,7 +18,7 @@ div#popup-shadow {
 
 div#popup {
     height: 80%;
-    width: 50%;
+    width: 30%;
     min-width: 350px;
     position: fixed;
     top: 50%;
@@ -95,8 +95,25 @@ div#popup-information {
     text-align: center;
 }
 
-div#popup-information p {
-    margin: 4px;
+div#popup-information h2 {
     margin-top: 8px;
+}
+
+div#popup-information p {
+    margin: 8px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+div#popup-information ul {
+    text-align: left;
+    margin-inline-start: 30px;
+}
+
+div#popup-information ul li {
+    margin-bottom: 3px;
+}
+
+div#popup-help-div p{
     margin-bottom: 8px;
 }

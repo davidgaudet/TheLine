@@ -1,5 +1,12 @@
 $(document).ready(function(){
 
+    // Question mark button, handle click
+    $(document).on({
+        click: function(){
+            showPopup();
+        }
+    }, 'div#question-mark img');
+
     // Detect when one of the list elements in the popup box is hovered over
     $(document).on({
         mouseenter: function(){
@@ -24,14 +31,13 @@ $(document).ready(function(){
             $(this).addClass('popup-selected');
 
             $('div#popup-information').children().addClass('hidden');
-            console.log($('div#popup-information').children());
 
             // Display the information that corresponds to the clicked button
             var clickedText = $(this).text();
             if (clickedText == 'Intro') {
                 $('div#popup-intro-div').removeClass('hidden');
             }
-            else if (clickedText == 'Help'){
+            else if (clickedText == 'Mechanics'){
                 $('div#popup-help-div').removeClass('hidden');
             }
             else {

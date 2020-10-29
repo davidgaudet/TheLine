@@ -39,12 +39,12 @@ header {
   height: 10%;
   background-color: #222;
   color: white;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .myBar {
-  width: 10px;
-  height: 10px;
+  margin-top: -15%;
+  transform: translate(0%, 15%);
 }
 
 .menu {
@@ -82,17 +82,14 @@ canvas {
   overflow: auto;
 }
 
-#bar-info {
-  float: right;
-  margin-right: 0px;
-  padding-right: 0px;
-  margin-top: -2rem;
-}
-
 #line-header {
-  margin-top: 2rem;
   text-align: justify;
-  vertical-align: top;
+  display: table;
+  table-layout: fixed;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 #attributes {
@@ -101,21 +98,18 @@ canvas {
 }
 
 #project-info {
-  float: left;
-  vertical-align: top;
-  display: inline-block;
-  width: 13%;
-  margin-right: 20%;
+  vertical-align: middle;
+  display: table-cell;
+  width: 20%;
 }
 
 #color-buttons {
-  float: middle;
-  margin-top: -.5rem;
-  position: relative;
-  display: inline-block;
-  bottom: 10%;
-  vertical-align: top;
-  width: 40%;
+  vertical-align: middle;
+  display: table-cell;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  text-align: center;
 }
 
 #navigation {
@@ -128,9 +122,34 @@ canvas {
   position: relative;
   display: inline-block;
   left: auto;
-  height: 50px;
-  width: 50px;
+  height: 60px;
+  width: 60px;
   border-radius: 4px;
+}
+
+#bar-info {
+  width: 120px;
+  height: 80%;
+  overflow: hidden;
+  vertical-align: middle;
+  display: table-cell;
+}
+
+#question-mark {
+  width: 50px;
+  vertical-align: middle;
+  display: table-cell;
+}
+
+#question-mark img {
+  width: 90%;
+  margin-left: 5%;
+}
+
+#question-mark img:hover {
+  background-color: gray;
+  border-radius: 100%;
+
 }
 
 @media (max-width: 600px) {
