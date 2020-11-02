@@ -177,6 +177,10 @@ canvas {
 
 }
 
+#user-count{
+  font-size: .9rem;
+}
+
 @media (max-width: 600px) {
   h1 {
     font-size: 15px;

@@ -8,6 +8,7 @@ function onColorClick(color) {
 }
 //colors of the rainbow!
 let colors = ['#cc4125', '#e06666', '#f6b26b', '#ffd966', '#93c47d', '#76a5af', '#6fa8dc', '#8e7cc3', '#c27ba0', 'white'];
+
 function changeColor() {
   var btns = document.getElementsByClassName("button");
   for (var i = 0; i < btns.length; i++) {
@@ -76,17 +77,35 @@ document.addEventListener("DOMContentLoaded", function() {
     drawAll();
   });
 
+  //updates the user count in the header
+  //this gets updated whenver someone connects/disconnects
+  socket.on('user_count_changed', function(userCount) {
+    console.log("user count is " + userCount);
+    document.getElementById("user-count").innerHTML = "Number of connected users : " + userCount;
+  });
+
   // Add line to new point (extend the path)
   socket.on('draw_line', async function(point) {
-    let lastPoint = pathCopy[pathCopy.length-1];
+
+
+    let lastPoint = pathCopy[pathCopy.length - 1];
     let xDif = point.x - lastPoint.x;
     let yDif = point.y - lastPoint.y;
     pathCopy.push(point);
-    drawLine({ x: lastPoint.x + xDif/4, y: lastPoint.y + yDif/4 });
+    drawLine({
+      x: lastPoint.x + xDif / 4,
+      y: lastPoint.y + yDif / 4
+    });
     await wait(50);
-    drawLine({ x: lastPoint.x + xDif/2, y: lastPoint.y + yDif/2 });
+    drawLine({
+      x: lastPoint.x + xDif / 2,
+      y: lastPoint.y + yDif / 2
+    });
     await wait(50);
-    drawLine({ x: lastPoint.x + 3*xDif/4, y: lastPoint.y + 3*yDif/4 });
+    drawLine({
+      x: lastPoint.x + 3 * xDif / 4,
+      y: lastPoint.y + 3 * yDif / 4
+    });
     await wait(50);
     drawLine(point);
   });
@@ -99,11 +118,10 @@ document.addEventListener("DOMContentLoaded", function() {
     drawAll(color);
   });
 
-  
+
   // Show clicks as they're recieved by server
   socket.on('show_new_click', function(point) {
-    console.log("Final coord is" + point.x + " " + point.y);
-    clickEffect(point.x  * width, (point.y *  height) + (window.innerHeight * HEADER_HEIGHT));
+    clickEffect(point.x * width, (point.y * height) + (window.innerHeight * HEADER_HEIGHT));
   });
 
   // Helper functions for making the actual UI changes
@@ -155,10 +173,15 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   }
 
-  function wait(time) { return new Promise(resolve => { setTimeout(() => { resolve('resolved'); }, time); }); }
+  function wait(time) {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve('resolved');
+      }, time);
+    });
+  }
 
   function clickEffect(x, y) {
-    console.log("click animation deploying");
     var d = document.createElement("div");
     d.className = "clickEffect";
     d.style.top = y + "px";
