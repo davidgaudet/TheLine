@@ -31,7 +31,7 @@ let newMoves = [];
 
 // Handle new users connecting
 io.on('connection', function (socket) {
-
+   console.log(socket.request.connection.remoteAddress);
    // Send all data to new user connecting
    socket.emit('draw_path_and_shapes', shapes, path, colors);
 
