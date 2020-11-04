@@ -2,12 +2,13 @@
 let curColor = '#cc4125';
 let shapeColors = [];
 
+//colors of the rainbow!
+let colors = ['#cc4125', '#e06666', '#f6b26b', '#ffd966', '#93c47d', '#76a5af', '#6fa8dc', '#8e7cc3', '#c27ba0', 'white'];
+
 function onColorClick(color) {
   curColor = color;
   console.log("%s", color);
 }
-//colors of the rainbow!
-let colors = ['#cc4125', '#e06666', '#f6b26b', '#ffd966', '#93c47d', '#76a5af', '#6fa8dc', '#8e7cc3', '#c27ba0', 'white'];
 
 function changeColor() {
   var btns = document.getElementsByClassName("button");
@@ -21,12 +22,16 @@ function updateSelectedColor(element) {
   $(element).addClass('selected-color');
 }
 
+// Start of core code for handling changes to the user's UI and state.
 document.addEventListener("DOMContentLoaded", function() {
 
   // Game info
   const HEADER_HEIGHT = 0.1;
   const CANVAS_HEIGHT = 0.9;
-  const MOVE_COOLDOWN = 1000;
+  const COOLDOWN_MINIMUM = 850;
+  const COOLDOWN_PER_USER = 150; // Increases by 100 ms per new user
+  let current_cooldown = 1000;   // Changes as user count increases / decreases
+  let user_count = 1;
 
   // Info for this user's UI and state
   let socket = io.connect();
@@ -34,23 +39,25 @@ document.addEventListener("DOMContentLoaded", function() {
   let height = window.innerHeight * CANVAS_HEIGHT;
   let mouse = {
     click: false,
-    pos: {
-      x: 0,
-      y: 0
-    }
+    pos: { x: 0, y: 0 }
   };
   let moveTime = 0; // Clock time when user send a move to the server
-  let pathCopy = []; // Users local copy of the path
-  let shapes = [];
   let canvas = document.getElementById('drawing');
   let context = canvas.getContext('2d');
   canvas.width = width;
   canvas.height = height;
 
+  // Users local copy of the path and shapes
+  let pathCopy = []; 
+  let shapes = [];
+
   // When the user clicks, store their move info
   canvas.onmousedown = function(e) {
-    if ((Date.now() - moveTime) < MOVE_COOLDOWN) return;
+    if ((Date.now() - moveTime) < current_cooldown) return;
     moveTime = Date.now();
+    // Update cooldown
+    current_cooldown = COOLDOWN_MINIMUM + COOLDOWN_PER_USER*user_count;
+    
     //Essentially, the y coord click on the screen needs to be offset by the height of the header, because
     // y=0 on the Canvas is actually y=79 on just the screen, but we need to "ignore" the Header
     //which is why I subtract height of header (calculated by getting .08 of screen height) from the click
@@ -69,6 +76,27 @@ document.addEventListener("DOMContentLoaded", function() {
     );
   };
 
+  // Display how long the user needs to wait before their cooldown ends.
+  function updateRechargeBar() {
+    let timeLeft = Date.now() - moveTime;
+    let percentage = (timeLeft / current_cooldown) * 100;
+    if (timeLeft <= current_cooldown + 40) {
+      bar.set(
+        percentage, /* target value. */
+        true /* enable animation. default is true */
+      );
+    }
+  }
+
+  // Socket functions. Recieves info from server.
+
+  // Updates the user count in the header
+  socket.on('user_count_changed', function(userCount) {
+    console.log("user count is " + userCount);
+    user_count = userCount;
+    document.getElementById("user-count").innerHTML = "Number of connected users : " + userCount;
+  });
+
   // Draw everything (from scratch)
   socket.on('draw_path_and_shapes', function(shapesArr, path, colorArr) {
     shapes = shapesArr;
@@ -77,40 +105,7 @@ document.addEventListener("DOMContentLoaded", function() {
     drawAll();
   });
 
-  //updates the user count in the header
-  //this gets updated whenver someone connects/disconnects
-  socket.on('user_count_changed', function(userCount) {
-    console.log("user count is " + userCount);
-    document.getElementById("user-count").innerHTML = "Number of connected users : " + userCount;
-  });
-
-  // Add line to new point (extend the path)
-  socket.on('draw_line', async function(point) {
-
-
-    let lastPoint = pathCopy[pathCopy.length - 1];
-    let xDif = point.x - lastPoint.x;
-    let yDif = point.y - lastPoint.y;
-    pathCopy.push(point);
-    drawLine({
-      x: lastPoint.x + xDif / 4,
-      y: lastPoint.y + yDif / 4
-    });
-    await wait(50);
-    drawLine({
-      x: lastPoint.x + xDif / 2,
-      y: lastPoint.y + yDif / 2
-    });
-    await wait(50);
-    drawLine({
-      x: lastPoint.x + 3 * xDif / 4,
-      y: lastPoint.y + 3 * yDif / 4
-    });
-    await wait(50);
-    drawLine(point);
-  });
-
-  // Add shape
+  // Add new shape
   socket.on('draw_shape', function(shape, path, color) {
     shapes.push(shape);
     pathCopy = path;
@@ -118,6 +113,20 @@ document.addEventListener("DOMContentLoaded", function() {
     drawAll(color);
   });
 
+  // Add line to new point (extend the path)
+  socket.on('draw_line', async function(point) {
+    let lastPoint = pathCopy[pathCopy.length - 1];
+    let xDif = point.x - lastPoint.x;
+    let yDif = point.y - lastPoint.y;
+    pathCopy.push(point);
+    drawLine({x: lastPoint.x + xDif / 4, y: lastPoint.y + yDif / 4 });
+    await wait(50);
+    drawLine({ x: lastPoint.x + xDif / 2, y: lastPoint.y + yDif / 2 });
+    await wait(50);
+    drawLine({ x: lastPoint.x + 3 * xDif / 4, y: lastPoint.y + 3 * yDif / 4 });
+    await wait(50);
+    drawLine(point);
+  });
 
   // Show clicks as they're recieved by server
   socket.on('show_new_click', function(point) {
@@ -125,6 +134,17 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   // Helper functions for making the actual UI changes
+
+  function drawAll() {
+    width = window.innerWidth;
+    height = window.innerHeight * CANVAS_HEIGHT;
+    canvas.width = width;
+    canvas.height = height;
+    drawShapes();
+    context.beginPath();
+    drawPath();
+  }
+
   function drawPath() {
     for (let i in pathCopy) drawLine(pathCopy[i]);
   }
@@ -149,38 +169,6 @@ document.addEventListener("DOMContentLoaded", function() {
     context.closePath();
   }
 
-  function drawAll() {
-    width = window.innerWidth;
-    //Allows for me to add a footer & header, breakdown is that header is
-    //.08 of page, footer is .1, rest (the canvas) is .82
-    //So I made height equal to 82% of screen's height
-    height = window.innerHeight * CANVAS_HEIGHT;
-    canvas.width = width;
-    canvas.height = height;
-    drawShapes();
-    context.beginPath();
-    drawPath();
-  }
-
-  function updateRechargeBar() {
-    let timeLeft = Date.now() - moveTime;
-    let percentage = (timeLeft / MOVE_COOLDOWN) * 100;
-    if (timeLeft <= MOVE_COOLDOWN + 40) {
-      bar.set(
-        percentage, /* target value. */
-        true /* enable animation. default is true */
-      );
-    }
-  }
-
-  function wait(time) {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve('resolved');
-      }, time);
-    });
-  }
-
   function clickEffect(x, y) {
     var d = document.createElement("div");
     d.className = "clickEffect";
@@ -192,6 +180,15 @@ document.addEventListener("DOMContentLoaded", function() {
     }.bind(this));
   }
 
+  function wait(time) {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve('resolved');
+      }, time);
+    });
+  }
+
+  // Mainloop, runs every 30 ms.
   async function mainLoop() {
     // Check if the user has clicked to add a line
     changeColor();
