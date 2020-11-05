@@ -100,7 +100,7 @@ canvas {
 #project-info {
   display: inline-block;
   position: relative;
-  width: calc((100% - 170px) * 0.25);
+  width: calc((100% - 260px) * 0.25);
 }
 
 #project-info span {
@@ -117,7 +117,7 @@ canvas {
   overflow-y: hidden;
   white-space: nowrap;
   text-align: center;
-  width: calc((100% - 170px) * 0.75);
+  width: calc((100% - 260px) * 0.75);
   height: 100%;
 }
 
@@ -131,6 +131,7 @@ canvas {
   border-color: black;
   border-radius: 4px;
   margin-right: -4px;
+  transition: border-radius ease 0.8s;
 }
 
 .selected-color {
@@ -152,6 +153,7 @@ canvas {
 }
 
 #bar-info {
+  cursor: default;
   width: 120px;
   height: 100%;
   overflow: hidden !important;
@@ -159,13 +161,20 @@ canvas {
   display: inline-block;
 }
 
-#timer {
-  font-size: 1em;
+#reset-timer-div {
+  font-size: 16px;
   display: inline-block;
-  width: 5%;
-  text-align: left;
   position: relative;
-  bottom: 25px;
+  width: 90px;
+}
+
+#reset-timer-div span {
+  cursor: default;
+  margin-left: -10px;
+  display: inline-block;
+  vertical-align: middle;
+  text-align: center;
+  width: calc(100% + 10px);
 }
 
 #question-mark {

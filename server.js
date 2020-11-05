@@ -17,6 +17,9 @@ console.log("Open http://localhost:8080/")
 let path = [{x: 0.5,y: 0.5}, {x: 0.501,y: 0.501}];
 let shapes = [];
 let colors = [];
+let defaultCount = 172800; // Starting time of the reset timer in seconds
+let timerCount = defaultCount;
+let TimerStarted = false;
 
 // Consts for controlling draw speed
 const LINE_COOLDOWN = 180; // Time (in milliseconds) between each new point being sent to clients.
@@ -65,6 +68,19 @@ io.on('connection', function(socket) {
       bus.emit('unlocked');
     }
    });
+
+   // Start server-side reset timer
+   if (TimerStarted == false) {
+      TimerStarted = true;
+      setInterval(function(){
+         io.sockets.emit('reset_counter', timerCount);
+         timerCount--;
+         if (timerCount == -1){
+            clearInterval(this);
+         }
+      }, 1000);
+   }
+   
 });
 
 // Mainloop for sending state changes to clients.

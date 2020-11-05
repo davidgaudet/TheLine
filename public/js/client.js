@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function() {
   socket.on('user_count_changed', function(userCount) {
     console.log("user count is " + userCount);
     user_count = userCount;
-    document.getElementById("user-count").innerHTML = "Number of connected users : " + userCount;
+    document.getElementById("user-count").innerHTML = "Active Users: " + userCount;
   });
 
   // Draw everything (from scratch)
@@ -139,6 +139,24 @@ document.addEventListener("DOMContentLoaded", function() {
   // Show clicks as they're recieved by server
   socket.on('show_new_click', function(point) {
     clickEffect(point.x * width, (point.y * height) + (window.innerHeight * HEADER_HEIGHT));
+  });
+
+  // Update the reset timer
+  socket.on('reset_counter', function(timerCount) {
+    var time = parseInt(timerCount, 10);
+    var hours = Math.floor(time / 3600);
+    var minutes = Math.floor((time - (hours * 3600)) / 60);
+    var seconds = time % 60;
+
+    hours = hours < 10 ? "0" + hours : hours;
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+    seconds = seconds < 10 ? "0" + seconds : seconds;
+    $('p#reset-timer').text(hours + ":" + minutes + ":" + seconds);
+
+    if(timerCount < 300) {
+      var color = timerCount % 2 ? 'white' : 'red';
+      $('div#reset-timer-div span').css('color', color);
+    }
   });
 
   // Helper functions for making the actual UI changes
@@ -197,33 +215,33 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
-  setTimeout(function() { alert( "1 minute has passed" ); }, 60000);
-  setTimeout(function() { alert( "5 minutes have passed" ); }, 60000 * 5);
-  setTimeout(function() { alert( "10 minutes have passed" ); }, 60000 * 10);
+  // setTimeout(function() { alert( "1 minute has passed" ); }, 60000);
+  // setTimeout(function() { alert( "5 minutes have passed" ); }, 60000 * 5);
+  // setTimeout(function() { alert( "10 minutes have passed" ); }, 60000 * 10);
 
-  function startTimer(duration, clock) {
-    var timer = duration, minutes, seconds;
-    setInterval(function () {
-        min = parseInt(timer / 60, 10)
-        sec = parseInt(timer % 60, 10);
-        min = minutes < 10 ? "0" + min : min;
-        sec = seconds < 10 ? "0" + sec : sec;
-        if (sec < 10) {
-          clock.textContent = min + ":0" + sec;
-        } else {
-          clock.textContent = min + ":" + sec;
-        }
-        if (--timer < 0) {
-            timer = duration;
-        }
-    }, 1000);
- }
+//   function startTimer(duration, clock) {
+//     var timer = duration, minutes, seconds;
+//     setInterval(function () {
+//         min = parseInt(timer / 60, 10)
+//         sec = parseInt(timer % 60, 10);
+//         min = minutes < 10 ? "0" + min : min;
+//         sec = seconds < 10 ? "0" + sec : sec;
+//         if (sec < 10) {
+//           clock.textContent = min + ":0" + sec;
+//         } else {
+//           clock.textContent = min + ":" + sec;
+//         }
+//         if (--timer < 0) {
+//             timer = duration;
+//         }
+//     }, 1000);
+//  }
  
- window.onload = function beginTimer() {
-    var tenMinutes = 60 * 10,
-        gameClock = document.querySelector('#timer');
-    startTimer(tenMinutes, gameClock);
-  };
+//  window.onload = function beginTimer() {
+//     var tenMinutes = 60 * 10,
+//         gameClock = document.querySelector('#timer');
+//     startTimer(tenMinutes, gameClock);
+//   };
 
 
   // Mainloop, runs every 30 ms.

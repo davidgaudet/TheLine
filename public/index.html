@@ -51,11 +51,10 @@
       <div id="project-info">
         <span>
           <h1>Mosaic</h1>
-          <p id="user-count">Active users :</p>
+          <p id="user-count">Active Users: </p>
         </span>
       </div
       ><div id="color-buttons">
-        <p id='timer'>0.00</p>
         <div class="button" onclick="onColorClick(colors[0]);updateSelectedColor(this)"></div>
         <div class="button" onclick="onColorClick(colors[1]);updateSelectedColor(this)"></div>
         <div class="button" onclick="onColorClick(colors[2]);updateSelectedColor(this)"></div>
@@ -69,6 +68,12 @@
       </div
       ><div id="bar-info">
         <div class="myBar label-center"></div>
+      </div
+      ><div id="reset-timer-div">
+        <span>
+          <h4><u>Reset Timer</u></h4>
+          <p id='reset-timer'>00:00:00</p>
+        </span>
       </div
       ><div id="question-mark">
         <img src="./img/questionMark.png" alt="Question Mark">
