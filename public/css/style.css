@@ -159,6 +159,15 @@ canvas {
   display: inline-block;
 }
 
+#timer {
+  font-size: 1em;
+  display: inline-block;
+  width: 5%;
+  text-align: left;
+  position: relative;
+  bottom: 25px;
+}
+
 #question-mark {
   width: 50px;
   height: 100%;

@@ -2,6 +2,14 @@
 let curColor = '#cc4125';
 let shapeColors = [];
 
+// var canvas2 = document.getElementById('drawing');
+//   var ctx = canvas2.getContext('2d');
+
+// var img1 = new Image();
+//   img1.src = 'https://mdn.mozillademos.org/files/222/Canvas_createpattern.png';
+//   var pat1 = context.createPattern(img1, 'repeat');
+
+
 //colors of the rainbow!
 let colors = ['#cc4125', '#e06666', '#f6b26b', '#ffd966', '#93c47d', '#76a5af', '#6fa8dc', '#8e7cc3', '#c27ba0', 'white'];
 
@@ -163,6 +171,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
   function drawShape(shape) {
     context.beginPath();
+    context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
     context.moveTo(shape[shape.length - 1].x * width, shape[shape.length - 1].y * height);
     for (let i in shape) context.lineTo(shape[i].x * width, shape[i].y * height);
     context.fill();
@@ -187,6 +196,35 @@ document.addEventListener("DOMContentLoaded", function() {
       }, time);
     });
   }
+
+  setTimeout(function() { alert( "1 minute has passed" ); }, 60000);
+  setTimeout(function() { alert( "5 minutes have passed" ); }, 60000 * 5);
+  setTimeout(function() { alert( "10 minutes have passed" ); }, 60000 * 10);
+
+  function startTimer(duration, clock) {
+    var timer = duration, minutes, seconds;
+    setInterval(function () {
+        min = parseInt(timer / 60, 10)
+        sec = parseInt(timer % 60, 10);
+        min = minutes < 10 ? "0" + min : min;
+        sec = seconds < 10 ? "0" + sec : sec;
+        if (sec < 10) {
+          clock.textContent = min + ":0" + sec;
+        } else {
+          clock.textContent = min + ":" + sec;
+        }
+        if (--timer < 0) {
+            timer = duration;
+        }
+    }, 1000);
+ }
+ 
+ window.onload = function beginTimer() {
+    var tenMinutes = 60 * 10,
+        gameClock = document.querySelector('#timer');
+    startTimer(tenMinutes, gameClock);
+  };
+
 
   // Mainloop, runs every 30 ms.
   async function mainLoop() {
