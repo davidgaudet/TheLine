@@ -1,0 +1,23 @@
+{
+    "files_to_load": 5,
+    "file_1": {
+        "file_name": "Entry1.png",
+        "date_added": "August 10th, 2020"
+    },
+    "file_2": {
+        "file_name": "Entry2.png",
+        "date_added": "August 8th, 2020"
+    },
+    "file_3": {
+        "file_name": "Entry3.png",
+        "date_added": "August 6th, 2020"
+    },
+    "file_4": {
+        "file_name": "Entry4.png",
+        "date_added": "August 4th, 2020"
+    },
+    "file_5": {
+        "file_name": "Entry5.png",
+        "date_added": "August 2nd, 2020"
+    }
+}

@@ -159,6 +159,13 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   });
 
+  socket.on('gallery_json_loaded', function(jsonString) {
+    var galleryJson = JSON.parse(jsonString);
+    // Pass the read json file from the server to the popup.js function
+    // This will populate the gallery section of the popup window
+    populateGallery(galleryJson);
+  });
+
   // Helper functions for making the actual UI changes
 
   function drawAll() {

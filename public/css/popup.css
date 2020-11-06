@@ -1,5 +1,5 @@
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 /* 
@@ -72,7 +72,7 @@ ul#popup-list {
 
 ul#popup-list li {
     float: left;
-    width: 50%;
+    width: calc(100% / 3);
     height: 100%;
     display: block;
     box-sizing: border-box;
@@ -112,8 +112,39 @@ div#popup-information ul {
 
 div#popup-information ul li {
     margin-bottom: 3px;
+    margin-right: 8px;
 }
 
 div#popup-help-div p{
     margin-bottom: 8px;
+}
+
+div#grid-wrap {
+    width: 100%;
+    margin-top: 1vh;
+    display: grid;
+    grid-template-columns: 49% 49%;
+    column-gap: 1%;
+    row-gap: 10px;
+}
+
+div#gallery-div span:hover{
+    background-color: red;
+}
+
+span#cell1 {
+    width: 50%;
+    justify-self: center;
+    grid-column-start: 1;
+    grid-column-end: 3;
+}
+
+div#gallery-div span img{
+    width: 75%;
+    margin-top: 3%;
+    box-shadow: 0 4px 4px -1px rgba(0, 0, 0, 0.4);
+}
+
+div#gallery-div span p{
+    margin: 0;
 }

@@ -1,5 +1,6 @@
-$(document).ready(function(){
+var gallery_json = null;
 
+$(document).ready(function(){
     // Question mark button, handle click
     $(document).on({
         click: function(){
@@ -37,8 +38,11 @@ $(document).ready(function(){
             if (clickedText == 'Intro') {
                 $('div#popup-intro-div').removeClass('hidden');
             }
-            else{
+            else if (clickedText == 'Mechanics'){
                 $('div#popup-help-div').removeClass('hidden');
+            }
+            else if (clickedText == 'Gallery'){
+                $('div#gallery-div').removeClass('hidden');
             }
         }
     }, 'ul#popup-list li:not(.popup-selected)');
@@ -57,3 +61,11 @@ function showPopup() {
     $('div#popup').removeClass('hidden');
 };
 
+function populateGallery(galleryJson) {
+    for (let index = galleryJson['files_to_load']; index > 0; index--) {
+        var current_file = galleryJson['file_' + index];
+        $('span#cell' + index + ' img').attr("src", "./img/gallery/" + current_file['file_name']);
+        $('span#cell' + index + ' p').text(current_file['date_added']);
+        $('span#cell' + index).removeClass('hidden');
+    }
+}
