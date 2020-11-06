@@ -17,8 +17,8 @@ console.log("Open http://localhost:8080/")
 let path = [{x: 0.5,y: 0.5}, {x: 0.501,y: 0.501}];
 let shapes = [];
 let colors = [];
-let originalCount = 5; // Starting time of the reset timer in seconds
-let timerCount = originalCount;
+let defaultCount = 172800; // Starting time of the reset timer in seconds
+let timerCount = defaultCount;
 let TimerStarted = false;
 
 // Consts for controlling draw speed
@@ -40,7 +40,7 @@ io.on('connection', function(socket) {
    userCount++;
    console.log("User connected, count is now : " + userCount);
    io.emit('user_count_changed', userCount);
-   
+
    // Send all data to new user connecting
    socket.emit('draw_path_and_shapes', shapes, path, colors);
 
@@ -55,7 +55,7 @@ io.on('connection', function(socket) {
    socket.on('new_click', async function lockableMoveHandler(point, color) {
       moveCount++;
       let tmpMoveCount = moveCount;
-      io.emit('show_new_click', point);
+      io.emit('show_new_click', point, color);
       if (lock) await new Promise(resolve => bus.once('unlocked', resolve));
       if (tmpMoveCount == moveCount && newMoves.length == 0) {
       lock = true;
@@ -76,67 +76,12 @@ io.on('connection', function(socket) {
          io.sockets.emit('reset_counter', timerCount);
          timerCount--;
          if (timerCount == -1){
-            timerCount = originalCount;
+            clearInterval(this);
          }
       }, 1000);
    }
-   
-   // newGalleryEntry(socket, 'Entry3.png', 'August 6th, 2020');
-   checkGalleryJson(socket);
+
 });
-
-async function checkGalleryJson(socket) {
-   const fs = require('fs');
-   fs.readFile('./public/img/gallery/gallery-json.json', 'utf8', (err, jsonString) => {
-      if (err) {
-         console.log("File read failed: ", err);
-         return
-      }
-      socket.emit('gallery_json_loaded', jsonString);
-      console.log('Gallery JSON loaded.');
-   })
-};
-
-async function newGalleryEntry(socket, name, date) {
-   const fs = require('fs');
-   fs.readFile('./public/img/gallery/gallery-json.json', 'utf8', (err, jsonString) => {
-      if (err) {
-         console.log("File read failed: ", err);
-         return
-      }
-
-      var old_json = JSON.parse(jsonString);
-      var new_json = {};
-
-      if (old_json['files_to_load'] == 5) {
-         new_json['files_to_load'] = 5;
-         new_json['file_1'] = {'file_name' : name, 'date_added' : date};
-         new_json['file_2'] = old_json['file_1'];
-         new_json['file_3'] = old_json['file_2'];
-         new_json['file_4'] = old_json['file_3'];
-         new_json['file_5'] = old_json['file_4'];
-      }
-      else {
-         var old_json_count = old_json['files_to_load']
-         new_json['files_to_load'] = old_json_count + 1;
-         new_json['file_1'] = {'file_name' : name, 'date_added' : date};
-
-         for (let index = 1; index <= old_json_count; index++) {
-            new_json['file_' + (index + 1)] = old_json['file_' + index];
-         }
-      }
-
-      fs.writeFile('./public/img/gallery/gallery-json.json', JSON.stringify(new_json), (err) => {
-         if (err) {
-            console.log("File read failed: ", err);
-         }
-      });
-
-      console.log('New gallery entry added to JSON.');
-
-      checkGalleryJson(socket);
-   })
-}
 
 // Mainloop for sending state changes to clients.
 async function mainLoop() {

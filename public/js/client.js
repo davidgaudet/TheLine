@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function() {
   canvas.height = height;
 
   // Users local copy of the path and shapes
-  let pathCopy = []; 
+  let pathCopy = [];
   let shapes = [];
 
   // When the user clicks, store their move info
@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", function() {
     moveTime = Date.now();
     // Update cooldown
     current_cooldown = COOLDOWN_MINIMUM + COOLDOWN_PER_USER*user_count;
-    
+
     //Essentially, the y coord click on the screen needs to be offset by the height of the header, because
     // y=0 on the Canvas is actually y=79 on just the screen, but we need to "ignore" the Header
     //which is why I subtract height of header (calculated by getting .08 of screen height) from the click
@@ -137,9 +137,16 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   // Show clicks as they're recieved by server
-  socket.on('show_new_click', function(point) {
-    clickEffect(point.x * width, (point.y * height) + (window.innerHeight * HEADER_HEIGHT));
-  });
+socket.on('show_new_click', function(point, color) {
+  console.log(color);
+  if(color != "white"){
+  clickEffect(point.x * width, (point.y * height) + (window.innerHeight * HEADER_HEIGHT), color);
+  }
+  else{
+    clickEffect(point.x * width, (point.y * height) + (window.innerHeight * HEADER_HEIGHT), "grey");
+  }
+});
+
 
   // Update the reset timer
   socket.on('reset_counter', function(timerCount) {
@@ -203,7 +210,7 @@ document.addEventListener("DOMContentLoaded", function() {
     context.closePath();
   }
 
-  function clickEffect(x, y) {
+  function clickEffect(x, y, color) {
     var d = document.createElement("div");
     d.className = "clickEffect";
     d.style.top = y + "px";
@@ -212,6 +219,7 @@ document.addEventListener("DOMContentLoaded", function() {
     d.addEventListener('animationend', function() {
       d.parentElement.removeChild(d);
     }.bind(this));
+    document.querySelector("div.clickEffect").style.borderColor = color;
   }
 
   function wait(time) {
@@ -243,7 +251,7 @@ document.addEventListener("DOMContentLoaded", function() {
 //         }
 //     }, 1000);
 //  }
- 
+
 //  window.onload = function beginTimer() {
 //     var tenMinutes = 60 * 10,
 //         gameClock = document.querySelector('#timer');
