@@ -58,15 +58,15 @@ io.on('connection', function(socket) {
       io.emit('show_new_click', point, color);
       if (lock) await new Promise(resolve => bus.once('unlocked', resolve));
       if (tmpMoveCount == moveCount && newMoves.length == 0) {
-      lock = true;
-      newMoves.push({
-         point: point,
-         color: color,
-         isNewMove: true
-      });
-      lock = false;
-      bus.emit('unlocked');
-    }
+         lock = true;
+         newMoves.push({
+            point: point,
+            color: color,
+            isNewMove: true
+         });
+         lock = false;
+         bus.emit('unlocked');
+      }
    });
 
    // Start server-side reset timer

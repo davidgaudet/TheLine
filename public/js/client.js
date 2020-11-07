@@ -1,14 +1,5 @@
 // Client / user / front-end code
 let curColor = '#cc4125';
-let shapeColors = [];
-
-// var canvas2 = document.getElementById('drawing');
-//   var ctx = canvas2.getContext('2d');
-
-// var img1 = new Image();
-//   img1.src = 'https://mdn.mozillademos.org/files/222/Canvas_createpattern.png';
-//   var pat1 = context.createPattern(img1, 'repeat');
-
 
 //colors of the rainbow!
 let colors = ['#cc4125', '#e06666', '#f6b26b', '#ffd966', '#93c47d', '#76a5af', '#6fa8dc', '#8e7cc3', '#c27ba0', 'white'];
@@ -40,6 +31,7 @@ document.addEventListener("DOMContentLoaded", function() {
   const COOLDOWN_PER_USER = 150; // Increases by 100 ms per new user
   let current_cooldown = 1000;   // Changes as user count increases / decreases
   let user_count = 1;
+  let moveTime = 0; // Clock time when user send a move to the server
 
   // Info for this user's UI and state
   let socket = io.connect();
@@ -49,7 +41,6 @@ document.addEventListener("DOMContentLoaded", function() {
     click: false,
     pos: { x: 0, y: 0 }
   };
-  let moveTime = 0; // Clock time when user send a move to the server
   let canvas = document.getElementById('drawing');
   let context = canvas.getContext('2d');
   canvas.width = width;
@@ -58,25 +49,58 @@ document.addEventListener("DOMContentLoaded", function() {
   // Users local copy of the path and shapes
   let pathCopy = [];
   let shapes = [];
+  let shapeColors = [];
+
+  // Display Settings
+  let hidePath = false;
+  let animating = false;
+
+  
+  document.addEventListener('keydown', async function(event) {
+    console.log("test2");
+    console.log(event.key);
+
+    // Toggle path visibility by pressing 'h'
+    if (event.key == 'h') {
+      if (hidePath) hidePath = false;
+      else hidePath = true;
+      drawAll();
+    }
+
+    // Animate the history of the drawing by pressing 'a'.
+    if (event.key == 'a') {
+      animating = true;
+      hidePath = true;
+      width = window.innerWidth;
+      height = window.innerHeight * CANVAS_HEIGHT;
+      canvas.width = width;
+      canvas.height = height;
+
+      let shapesCopy = Object.assign(shapes);
+      let colorsCopy = Object.assign(shapeColors);
+      for (let i in shapesCopy) {
+        context.fillStyle = colorsCopy[i];
+        drawShape(shapesCopy[i]);
+        await wait(5000/shapesCopy.length);
+      }
+      animating = false;
+      hidePath = false;
+      drawAll();
+    }
+  });
 
   // When the user clicks, store their move info
   canvas.onmousedown = function(e) {
+    console.log("test");
     if ((Date.now() - moveTime) < current_cooldown) return;
     moveTime = Date.now();
     // Update cooldown
     current_cooldown = COOLDOWN_MINIMUM + COOLDOWN_PER_USER*user_count;
 
-    //Essentially, the y coord click on the screen needs to be offset by the height of the header, because
-    // y=0 on the Canvas is actually y=79 on just the screen, but we need to "ignore" the Header
-    //which is why I subtract height of header (calculated by getting .08 of screen height) from the click
+    // "ignore" the Header. Subtract height of header.
     let canvasCoord = e.clientY - (window.innerHeight * HEADER_HEIGHT);
     mouse.pos.x = e.clientX / width;
     mouse.pos.y = (canvasCoord) / height;
-    //e.clientY is the y coord relative to the screen;
-    // window.innerHeight is actual screen height;
-    // height is the height of the canvas;
-    // mouse.pos.y is a calculated percentage to show where click is relative to scale of canvas?
-    //canvasCoord is the calculated y coordinate relative to the canvas, not the screeen
     mouse.click = true;
     bar.set(
       0, /* target value. */
@@ -100,25 +124,28 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // Updates the user count in the header
   socket.on('user_count_changed', function(userCount) {
-    console.log("user count is " + userCount);
     user_count = userCount;
     document.getElementById("user-count").innerHTML = "Active Users: " + userCount;
   });
 
   // Draw everything (from scratch)
   socket.on('draw_path_and_shapes', function(shapesArr, path, colorArr) {
+    //if (animating) return;
     shapes = shapesArr;
     pathCopy = path;
     shapeColors = colorArr;
+    if (animating) return;
     drawAll();
   });
 
   // Add new shape
   socket.on('draw_shape', function(shape, path, color) {
+    //if (animating) return;
     shapes.push(shape);
     pathCopy = path;
     shapeColors.push(color);
-    drawAll(color);
+    if (animating) return;
+    drawAll();
   });
 
   // Add line to new point (extend the path)
@@ -127,6 +154,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let xDif = point.x - lastPoint.x;
     let yDif = point.y - lastPoint.y;
     pathCopy.push(point);
+    if (hidePath || animating) return;
     drawLine({x: lastPoint.x + xDif / 4, y: lastPoint.y + yDif / 4 });
     await wait(50);
     drawLine({ x: lastPoint.x + xDif / 2, y: lastPoint.y + yDif / 2 });
@@ -137,15 +165,14 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   // Show clicks as they're recieved by server
-socket.on('show_new_click', function(point, color) {
-  console.log(color);
-  if(color != "white"){
-  clickEffect(point.x * width, (point.y * height) + (window.innerHeight * HEADER_HEIGHT), color);
-  }
-  else{
-    clickEffect(point.x * width, (point.y * height) + (window.innerHeight * HEADER_HEIGHT), "grey");
-  }
-});
+  socket.on('show_new_click', function(point, color) {
+    if(color != "white"){
+      clickEffect(point.x * width, (point.y * height) + (window.innerHeight * HEADER_HEIGHT), color);
+    }
+    else{
+      clickEffect(point.x * width, (point.y * height) + (window.innerHeight * HEADER_HEIGHT), "grey");
+    }
+  });
 
 
   // Update the reset timer
@@ -180,9 +207,9 @@ socket.on('show_new_click', function(point, color) {
     height = window.innerHeight * CANVAS_HEIGHT;
     canvas.width = width;
     canvas.height = height;
-    drawShapes();
+    if (!animating) drawShapes();
     context.beginPath();
-    drawPath();
+    if (!hidePath) drawPath();
   }
 
   function drawPath() {
@@ -190,6 +217,7 @@ socket.on('show_new_click', function(point, color) {
   }
 
   function drawLine(point) {
+    if (animating || hidePath) return;
     context.lineTo(point.x * width, point.y * height);
     context.stroke();
   }
