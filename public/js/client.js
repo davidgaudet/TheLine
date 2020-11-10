@@ -21,6 +21,16 @@ function updateSelectedColor(element) {
   $(element).addClass('selected-color');
 }
 
+// var checkbox = document.querySelector('input[type="checkbox"]');
+//     checkbox.addEventListener('change', function () {
+//       if (checkbox.checked) {
+//         // do this
+//         console.log('Checked');
+//       } else {
+//         // do that
+//         console.log('Not checked');
+//       } });
+
 // Start of core code for handling changes to the user's UI and state.
 document.addEventListener("DOMContentLoaded", function() {
 
@@ -50,6 +60,7 @@ document.addEventListener("DOMContentLoaded", function() {
   let pathCopy = [];
   let shapes = [];
   let shapeColors = [];
+  var patterns = [];
 
   // Display Settings
   let hidePath = false;
@@ -141,6 +152,14 @@ document.addEventListener("DOMContentLoaded", function() {
   // Add new shape
   socket.on('draw_shape', function(shape, path, color) {
     //if (animating) return;
+    var checkbox = document.querySelector('input[type="checkbox"]');
+    if (checkbox.checked) {
+      console.log('Checked');
+      patterns.push(true);
+    } else {
+      console.log('Not checked');
+      patterns.push(false);;
+    }
     shapes.push(shape);
     pathCopy = path;
     shapeColors.push(color);
@@ -224,7 +243,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
   function drawShapes() {
     for (let i in shapes) {
-      context.fillStyle = shapeColors[i];
+      var checkbox = document.querySelector('input[type="checkbox"]');
+      console.log("pat "+ patterns[i]);
+      if (patterns[i]==true) {
+        console.log('Checked');
+        context.fillStyle = createPat(shapeColors[i], i, i);
+      } else {
+        console.log('Not checked');
+        context.fillStyle = shapeColors[i];
+      }
       drawShape(shapes[i]);
     }
   }
@@ -237,6 +264,53 @@ document.addEventListener("DOMContentLoaded", function() {
     context.fill();
     context.closePath();
   }
+
+  function createPat(color, arc, rect) {
+    var canvasPattern = document.createElement("canvas");
+    canvasPattern.width = 10;
+    canvasPattern.height = 10;
+    var contextPattern = canvasPattern.getContext("2d");
+    contextPattern.fillStyle = color;
+    contextPattern.fillRect(0, 0, canvas.width, canvas.height);
+
+    // draw a pattern on an off-screen canvas
+    contextPattern.beginPath();
+    contextPattern.strokeRect(2, 2, 10, 10);
+    contextPattern.arc(arc%10, arc%10, 3, 0, Math.PI);
+    contextPattern.rect(rect%10, rect%10, 1, 1);
+    contextPattern.arc(arc%10, arc%10, 3, 0, Math.PI);
+    contextPattern.stroke();
+    var pattern = context.createPattern(canvasPattern,"repeat");
+    context.fillStyle = pattern;
+
+    return pattern;
+  }
+
+  function drawHeart() {
+    var canvas = document.createElement('canvas');
+    if (canvas.getContext) {
+      var ctx = canvas.getContext('2d');
+  
+      // Cubic curves example
+      ctx.beginPath();
+      ctx.moveTo(75, 40);
+      ctx.bezierCurveTo(75, 37, 70, 25, 50, 25);
+      ctx.bezierCurveTo(20, 25, 20, 62.5, 20, 62.5);
+      ctx.bezierCurveTo(20, 80, 40, 102, 75, 120);
+      ctx.bezierCurveTo(110, 102, 130, 80, 130, 62.5);
+      ctx.bezierCurveTo(130, 62.5, 130, 25, 100, 25);
+      ctx.bezierCurveTo(85, 25, 75, 37, 75, 40);
+      ctx.fill();
+      var pattern = context.createPattern(ctx,"repeat");
+      context.fillStyle = pattern;
+
+      return pattern;
+    }
+
+  }
+
+
+
 
   function clickEffect(x, y, color) {
     var d = document.createElement("div");
@@ -257,34 +331,6 @@ document.addEventListener("DOMContentLoaded", function() {
       }, time);
     });
   }
-
-  // setTimeout(function() { alert( "1 minute has passed" ); }, 60000);
-  // setTimeout(function() { alert( "5 minutes have passed" ); }, 60000 * 5);
-  // setTimeout(function() { alert( "10 minutes have passed" ); }, 60000 * 10);
-
-//   function startTimer(duration, clock) {
-//     var timer = duration, minutes, seconds;
-//     setInterval(function () {
-//         min = parseInt(timer / 60, 10)
-//         sec = parseInt(timer % 60, 10);
-//         min = minutes < 10 ? "0" + min : min;
-//         sec = seconds < 10 ? "0" + sec : sec;
-//         if (sec < 10) {
-//           clock.textContent = min + ":0" + sec;
-//         } else {
-//           clock.textContent = min + ":" + sec;
-//         }
-//         if (--timer < 0) {
-//             timer = duration;
-//         }
-//     }, 1000);
-//  }
-
-//  window.onload = function beginTimer() {
-//     var tenMinutes = 60 * 10,
-//         gameClock = document.querySelector('#timer');
-//     startTimer(tenMinutes, gameClock);
-//   };
 
 
   // Mainloop, runs every 30 ms.
