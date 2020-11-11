@@ -141,7 +141,7 @@ canvas {
   transition: border-radius ease 0.8s;
 }
 
-.button:not(.selected-color):hover{
+.button:not(.selected-color):hover {
   opacity: 60%;
   cursor: pointer;
 }
@@ -192,11 +192,19 @@ canvas {
 #question-mark img:hover {
   background-color: gray;
   border-radius: 100%;
-
 }
 
-#user-count{
+#user-count {
   font-size: .9rem;
+}
+
+#transparent {
+  width: 100%;
+  float: middle;
+}
+
+#trans-amount {
+  font-size: 10px;
 }
 
 @media (max-width: 600px) {
