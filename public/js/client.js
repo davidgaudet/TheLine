@@ -84,9 +84,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
       let shapesCopy = Object.assign(shapes);
       let colorsCopy = Object.assign(shapeColors);
+      let alphaCopy = Object.assign(alphaValues);
       for (let i in shapesCopy) {
         context.fillStyle = colorsCopy[i];
+        context.globalAlpha = alphaCopy[i];
         drawShape(shapesCopy[i]);
+        context.globalAlpha = 1;
         await wait(5000 / shapesCopy.length);
       }
       animating = false;
