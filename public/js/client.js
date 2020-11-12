@@ -4,6 +4,9 @@ let curColor = '#cc4125';
 //colors of the rainbow!
 let colors = ['#cc4125', '#e06666', '#f6b26b', '#ffd966', '#93c47d', '#76a5af', '#6fa8dc', '#8e7cc3', '#c27ba0', 'white'];
 
+let currentAlpha = 1;
+let alphaValues = [];
+
 function onColorClick(color) {
   curColor = color;
   console.log("%s", color);
@@ -39,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function() {
   const CANVAS_HEIGHT = 0.9;
   const COOLDOWN_MINIMUM = 850;
   const COOLDOWN_PER_USER = 150; // Increases by 100 ms per new user
-  let current_cooldown = 1000;   // Changes as user count increases / decreases
+  let current_cooldown = 1000; // Changes as user count increases / decreases
   let user_count = 1;
   let moveTime = 0; // Clock time when user send a move to the server
 
@@ -49,7 +52,10 @@ document.addEventListener("DOMContentLoaded", function() {
   let height = window.innerHeight * CANVAS_HEIGHT;
   let mouse = {
     click: false,
-    pos: { x: 0, y: 0 }
+    pos: {
+      x: 0,
+      y: 0
+    }
   };
   let canvas = document.getElementById('drawing');
   let context = canvas.getContext('2d');
@@ -65,8 +71,9 @@ document.addEventListener("DOMContentLoaded", function() {
   // Display Settings
   let hidePath = false;
   let animating = false;
+  let patternBool = false;
 
-  
+
   document.addEventListener('keydown', async function(event) {
     console.log("test2");
     console.log(event.key);
@@ -89,10 +96,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
       let shapesCopy = Object.assign(shapes);
       let colorsCopy = Object.assign(shapeColors);
+      let alphaCopy = Object.assign(alphaValues);
       for (let i in shapesCopy) {
         context.fillStyle = colorsCopy[i];
+        context.globalAlpha = alphaCopy[i];
         drawShape(shapesCopy[i]);
-        await wait(5000/shapesCopy.length);
+        context.globalAlpha = 1;
+        await wait(5000 / shapesCopy.length);
       }
       animating = false;
       hidePath = false;
@@ -106,7 +116,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if ((Date.now() - moveTime) < current_cooldown) return;
     moveTime = Date.now();
     // Update cooldown
-    current_cooldown = COOLDOWN_MINIMUM + COOLDOWN_PER_USER*user_count;
+    current_cooldown = COOLDOWN_MINIMUM + COOLDOWN_PER_USER * user_count;
 
     // "ignore" the Header. Subtract height of header.
     let canvasCoord = e.clientY - (window.innerHeight * HEADER_HEIGHT);
@@ -140,29 +150,31 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   // Draw everything (from scratch)
-  socket.on('draw_path_and_shapes', function(shapesArr, path, colorArr) {
+  socket.on('draw_path_and_shapes', function(shapesArr, path, colorArr, alphas) {
     //if (animating) return;
     shapes = shapesArr;
     pathCopy = path;
     shapeColors = colorArr;
+    alphaValues = alphas;
     if (animating) return;
     drawAll();
   });
 
   // Add new shape
-  socket.on('draw_shape', function(shape, path, color) {
+  socket.on('draw_shape', function(shape, path, color, alpha) {
     //if (animating) return;
     var checkbox = document.querySelector('input[type="checkbox"]');
     if (checkbox.checked) {
       console.log('Checked');
-      patterns.push(true);
+      patterns = true;
     } else {
       console.log('Not checked');
-      patterns.push(false);;
+      patterns = false;
     }
     shapes.push(shape);
     pathCopy = path;
     shapeColors.push(color);
+    alphaValues.push(alpha);
     if (animating) return;
     drawAll();
   });
@@ -174,21 +186,29 @@ document.addEventListener("DOMContentLoaded", function() {
     let yDif = point.y - lastPoint.y;
     pathCopy.push(point);
     if (hidePath || animating) return;
-    drawLine({x: lastPoint.x + xDif / 4, y: lastPoint.y + yDif / 4 });
+    drawLine({
+      x: lastPoint.x + xDif / 4,
+      y: lastPoint.y + yDif / 4
+    });
     await wait(50);
-    drawLine({ x: lastPoint.x + xDif / 2, y: lastPoint.y + yDif / 2 });
+    drawLine({
+      x: lastPoint.x + xDif / 2,
+      y: lastPoint.y + yDif / 2
+    });
     await wait(50);
-    drawLine({ x: lastPoint.x + 3 * xDif / 4, y: lastPoint.y + 3 * yDif / 4 });
+    drawLine({
+      x: lastPoint.x + 3 * xDif / 4,
+      y: lastPoint.y + 3 * yDif / 4
+    });
     await wait(50);
     drawLine(point);
   });
 
   // Show clicks as they're recieved by server
   socket.on('show_new_click', function(point, color) {
-    if(color != "white"){
+    if (color != "white") {
       clickEffect(point.x * width, (point.y * height) + (window.innerHeight * HEADER_HEIGHT), color);
-    }
-    else{
+    } else {
       clickEffect(point.x * width, (point.y * height) + (window.innerHeight * HEADER_HEIGHT), "grey");
     }
   });
@@ -206,7 +226,7 @@ document.addEventListener("DOMContentLoaded", function() {
     seconds = seconds < 10 ? "0" + seconds : seconds;
     $('p#reset-timer').text(hours + ":" + minutes + ":" + seconds);
 
-    if(timerCount < 300) {
+    if (timerCount < 300) {
       var color = timerCount % 2 ? 'white' : 'red';
       $('div#reset-timer-div span').css('color', color);
     }
@@ -245,23 +265,28 @@ document.addEventListener("DOMContentLoaded", function() {
     for (let i in shapes) {
       var checkbox = document.querySelector('input[type="checkbox"]');
       console.log("pat "+ patterns[i]);
-      if (patterns[i]==true) {
+      if (patterns==true) {
         console.log('Checked');
         context.fillStyle = createPat(shapeColors[i], i, i);
       } else {
         console.log('Not checked');
         context.fillStyle = shapeColors[i];
       }
-      drawShape(shapes[i]);
+      //drawShape(shapes[i]);
+      //context.fillStyle = shapeColors[i];
+      let alpha = alphaValues[i];
+      drawShape(shapes[i], alpha);
     }
   }
 
-  function drawShape(shape) {
+  function drawShape(shape, alpha) {
     context.beginPath();
     context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
     context.moveTo(shape[shape.length - 1].x * width, shape[shape.length - 1].y * height);
     for (let i in shape) context.lineTo(shape[i].x * width, shape[i].y * height);
+    context.globalAlpha = alpha;
     context.fill();
+    context.globalAlpha = 1;
     context.closePath();
   }
 
@@ -324,6 +349,16 @@ document.addEventListener("DOMContentLoaded", function() {
     document.querySelector("div.clickEffect").style.borderColor = color;
   }
 
+  //handles transparency toggler
+  document.getElementById('transparent').onclick = function transparancyToggler() {
+    var result = document.getElementById("transparent").value;
+    currentAlpha = result / 100;
+    currentAlpha = 1.01 - currentAlpha;
+    console.log("Current transparent val is " + currentAlpha);
+    document.getElementById('trans-amount').innerHTML = "Transparency: " + (result) + "%";
+
+  }
+
   function wait(time) {
     return new Promise(resolve => {
       setTimeout(() => {
@@ -332,13 +367,12 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
-
   // Mainloop, runs every 30 ms.
   async function mainLoop() {
     // Check if the user has clicked to add a line
     changeColor();
     if (mouse.click) {
-      socket.emit('new_click', mouse.pos, curColor); // Send point to the server
+      socket.emit('new_click', mouse.pos, curColor, currentAlpha); // Send point to the server
       mouse.click = false;
     }
     //Allows recharge bar to show current status

@@ -141,7 +141,7 @@ canvas {
   transition: border-radius ease 0.8s;
 }
 
-.button:not(.selected-color):hover{
+.button:not(.selected-color):hover {
   opacity: 60%;
   cursor: pointer;
 }
@@ -155,7 +155,7 @@ canvas {
   /* padding: 10px; */
 }
 .switch input {display:none;}
-.slider {
+.slider2 {
   position: absolute;
   cursor: pointer;
   top: 0;
@@ -167,7 +167,7 @@ canvas {
   transition: .4s;
   /* padding: 5px; */
 }
-.slider:before {
+.slider2:before {
   position: absolute;
   content: "";
   height: 26px;
@@ -178,14 +178,14 @@ canvas {
   -webkit-transition: .4s;
   transition: .4s;
 }
-input:checked + .slider {
+input:checked + .slider2 {
   background-color: #2196F3;
 }
-input:focus + .slider {
+input:focus + .slider2 {
   box-shadow: 0 0 1px #2196F3;
 }
 
-input:checked + .slider:before {
+input:checked + .slider2:before {
   -webkit-transform: translateX(25px);
   -ms-transform: translateX(25px);
   -moz-transform: translateX(25px);
@@ -241,11 +241,19 @@ input:checked + .slider:before {
 #question-mark img:hover {
   background-color: gray;
   border-radius: 100%;
-
 }
 
-#user-count{
+#user-count {
   font-size: .9rem;
+}
+
+#transparent {
+  width: 100%;
+  float: middle;
+}
+
+#trans-amount {
+  font-size: 10px;
 }
 
 @media (max-width: 600px) {

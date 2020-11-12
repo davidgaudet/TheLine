@@ -57,7 +57,7 @@
       ><div id="color-buttons">
         <label class="switch">
           <input type="checkbox">
-          <span class="slider"></span>
+          <span class="slider2"></span>
         </label>
         <div class="button" onclick="onColorClick(colors[0]);updateSelectedColor(this)"></div>
         <div class="button" onclick="onColorClick(colors[1]);updateSelectedColor(this)"></div>
@@ -69,17 +69,21 @@
         <div class="button" onclick="onColorClick(colors[7]);updateSelectedColor(this)"></div>
         <div class="button" onclick="onColorClick(colors[8]);updateSelectedColor(this)"></div>
         <div class="button" onclick="onColorClick(colors[9]);updateSelectedColor(this)"></div>
-      </div
-      ><div id="bar-info">
+
+      </div>
+
+      <div id="bar-info">
+        <input id="transparent" type="range" min="0" max="100" value="0" class="slider">
+        <p id="trans-amount">Transparency: 0%</p>
         <div class="myBar label-center"></div>
-      </div
-      ><div id="reset-timer-div">
+      </div>
+      <div id="reset-timer-div">
         <span>
           <h4><u>Reset Timer</u></h4>
           <p id='reset-timer'>00:00:00</p>
         </span>
-      </div
-      ><div id="question-mark">
+      </div>
+      <div id="question-mark">
         <img src="./img/questionMark.png" alt="Question Mark">
       </div>
     </div>
@@ -92,70 +96,71 @@
 
   <div id="popup" class="hidden">
 
-      <div id="popup-header">
-          <p>Information</p>
+    <div id="popup-header">
+      <p>Information</p>
+    </div>
+
+    <div id="popup-buttons">
+      <ul id="popup-list">
+        <li class="popup-selected">Intro</li>
+        <li>Mechanics</li>
+        <li>Gallery</li>
+      </ul>
+    </div>
+
+    <div id="popup-information">
+      <div id="popup-intro-div">
+        <h2><u>Welcome to Mosaic!</u></h2>
+        <p>
+          This tool is designed to be a collaborative artistic experience.<br><br>
+          We want users to work together to use the minimalist features of this tool to create creative pieces of art. This is an exercise to see what the internet can come up with.<br><br>
+          The idea is to guide the line throughout the canvas to draw polygonal shapes, which, upon creating an intersection, will be colored in with the user's chosen color.<br><br>
+          The canvas will not be up indefinitely, however. The canvas will be wiped periodically to avoid clutter over time, after which it will be blank and ready for a fresh art piece to be created.
+        </p>
+        <h2>Have fun!</h2>
       </div>
 
-      <div id="popup-buttons">
-          <ul id="popup-list">
-              <li class="popup-selected">Intro</li>
-              <li>Mechanics</li>
-              <li>Gallery</li>
-          </ul>
+      <div id="popup-help-div" class="hidden">
+        <h2><u>Mosaic Tool Mechanics</u></h2>
+        <p>
+          Here we will provide a quick explanation of the Mosaic tool's mechanics.
+        </p>
+        <ul>
+          <li>Clicking on the canvas will cause the line to move toward the position of that user's click.</li>
+          <li>After a user's click, there is a 6 second cooldown until that user can make another move. In that time, other players can move the line in a different direction.</li>
+          <li>If a user's click results in an intersection with the line's existing body, the shape made will be filled in with the user's pre-chosen color</li>
+          <li>With the color bar, a user can choose a fill-in color. This color can be changed at any time, but will not affect shapes that have already been created.</li>
+          <li>The canvas is reset every 2 days, at which point the canvas will be screenshotted and kept in a gallery for 10 days (gallery is found on the third tab of this popup). After the 10 days, the work will be deleted, so manually save any
+            works that interest you.</li>
+        </ul>
+        <br>
       </div>
 
-      <div id="popup-information">
-          <div id="popup-intro-div">
-            <h2><u>Welcome to Mosaic!</u></h2>
-            <p>
-              This tool is designed to be a collaborative artistic experience.<br><br>
-              We want users to work together to use the minimalist features of this tool to create creative pieces of art. This is an exercise to see what the internet can come up with.<br><br>
-              The idea is to guide the line throughout the canvas to draw polygonal shapes, which, upon creating an intersection, will be colored in with the user's chosen color.<br><br>
-              The canvas will not be up indefinitely, however. The canvas will be wiped periodically to avoid clutter over time, after which it will be blank and ready for a fresh art piece to be created.
-            </p>
-            <h2>Have fun!</h2>
-          </div>
-
-          <div id="popup-help-div" class="hidden">
-            <h2><u>Mosaic Tool Mechanics</u></h2>
-            <p>
-              Here we will provide a quick explanation of the Mosaic tool's mechanics.
-            </p>
-            <ul>
-              <li>Clicking on the canvas will cause the line to move toward the position of that user's click.</li>
-              <li>After a user's click, there is a 6 second cooldown until that user can make another move. In that time, other players can move the line in a different direction.</li>
-              <li>If a user's click results in an intersection with the line's existing body, the shape made will be filled in with the user's pre-chosen color</li>
-              <li>With the color bar, a user can choose a fill-in color. This color can be changed at any time, but will not affect shapes that have already been created.</li>
-              <li>The canvas is reset every 2 days, at which point the canvas will be screenshotted and kept in a gallery for 10 days (gallery is found on the third tab of this popup). After the 10 days, the work will be deleted, so manually save any works that interest you.</li>
-            </ul>
-            <br>
-          </div>
-
-          <div id="gallery-div" class="hidden">
-            <div id="grid-wrap">
-              <span id="cell1" class="hidden">
-                <img src="#" alt="Img 1"><br>
-                <p>Date</p>
-              </span>
-              <span id="cell2" class="hidden">
-                <img src="#" alt="Img 2"><br>
-                <p>Date</p>
-              </span>
-              <span id="cell3" class="hidden">
-                <img src="#" alt="Img 3"><br>
-                <p>Date</p>
-              </span>
-              <span id="cell4" class="hidden">
-                <img src="#" alt="Img 4"><br>
-                <p>Date</p>
-              </span>
-              <span id="cell5" class="hidden">
-                <img src="#" alt="Img 5"><br>
-                <p>Date</p>
-              </span>
-            </div>
-          </div>
+      <div id="gallery-div" class="hidden">
+        <div id="grid-wrap">
+          <span id="cell1" class="hidden">
+            <img src="#" alt="Img 1"><br>
+            <p>Date</p>
+          </span>
+          <span id="cell2" class="hidden">
+            <img src="#" alt="Img 2"><br>
+            <p>Date</p>
+          </span>
+          <span id="cell3" class="hidden">
+            <img src="#" alt="Img 3"><br>
+            <p>Date</p>
+          </span>
+          <span id="cell4" class="hidden">
+            <img src="#" alt="Img 4"><br>
+            <p>Date</p>
+          </span>
+          <span id="cell5" class="hidden">
+            <img src="#" alt="Img 5"><br>
+            <p>Date</p>
+          </span>
+        </div>
       </div>
+    </div>
 
   </div>
 
