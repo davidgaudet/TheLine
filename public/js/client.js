@@ -24,16 +24,6 @@ function updateSelectedColor(element) {
   $(element).addClass('selected-color');
 }
 
-// var checkbox = document.querySelector('input[type="checkbox"]');
-//     checkbox.addEventListener('change', function () {
-//       if (checkbox.checked) {
-//         // do this
-//         console.log('Checked');
-//       } else {
-//         // do that
-//         console.log('Not checked');
-//       } });
-
 // Start of core code for handling changes to the user's UI and state.
 document.addEventListener("DOMContentLoaded", function() {
 
@@ -66,17 +56,15 @@ document.addEventListener("DOMContentLoaded", function() {
   let pathCopy = [];
   let shapes = [];
   let shapeColors = [];
-  var patterns = [];
 
   // Display Settings
   let hidePath = false;
   let animating = false;
-  let patternBool = false;
+  let patterns = false;
 
 
   document.addEventListener('keydown', async function(event) {
-    console.log("test2");
-    console.log(event.key);
+    if (animating) return;
 
     // Toggle path visibility by pressing 'h'
     if (event.key == 'h') {
@@ -98,7 +86,8 @@ document.addEventListener("DOMContentLoaded", function() {
       let colorsCopy = Object.assign(shapeColors);
       let alphaCopy = Object.assign(alphaValues);
       for (let i in shapesCopy) {
-        context.fillStyle = colorsCopy[i];
+        if (patterns) context.fillStyle = createPat(colorsCopy[i], i, i);
+        else context.fillStyle = colorsCopy[i];
         context.globalAlpha = alphaCopy[i];
         drawShape(shapesCopy[i]);
         context.globalAlpha = 1;
@@ -112,7 +101,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // When the user clicks, store their move info
   canvas.onmousedown = function(e) {
-    console.log("test");
     if ((Date.now() - moveTime) < current_cooldown) return;
     moveTime = Date.now();
     // Update cooldown
@@ -151,7 +139,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // Draw everything (from scratch)
   socket.on('draw_path_and_shapes', function(shapesArr, path, colorArr, alphas) {
-    //if (animating) return;
     shapes = shapesArr;
     pathCopy = path;
     shapeColors = colorArr;
@@ -162,15 +149,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // Add new shape
   socket.on('draw_shape', function(shape, path, color, alpha) {
-    //if (animating) return;
-    var checkbox = document.querySelector('input[type="checkbox"]');
-    if (checkbox.checked) {
-      console.log('Checked');
-      patterns = true;
-    } else {
-      console.log('Not checked');
-      patterns = false;
-    }
     shapes.push(shape);
     pathCopy = path;
     shapeColors.push(color);
@@ -206,11 +184,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // Show clicks as they're recieved by server
   socket.on('show_new_click', function(point, color) {
-    if (color != "white") {
-      clickEffect(point.x * width, (point.y * height) + (window.innerHeight * HEADER_HEIGHT), color);
-    } else {
-      clickEffect(point.x * width, (point.y * height) + (window.innerHeight * HEADER_HEIGHT), "grey");
-    }
+    if (color == "white") color = "grey";
+    clickEffect(point.x * width, (point.y * height) + (window.innerHeight * HEADER_HEIGHT), color);
   });
 
 
@@ -242,6 +217,7 @@ document.addEventListener("DOMContentLoaded", function() {
   // Helper functions for making the actual UI changes
 
   function drawAll() {
+    if (animating) return;
     width = window.innerWidth;
     height = window.innerHeight * CANVAS_HEIGHT;
     canvas.width = width;
@@ -263,17 +239,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
   function drawShapes() {
     for (let i in shapes) {
-      var checkbox = document.querySelector('input[type="checkbox"]');
-      console.log("pat "+ patterns[i]);
-      if (patterns==true) {
-        console.log('Checked');
-        context.fillStyle = createPat(shapeColors[i], i, i);
-      } else {
-        console.log('Not checked');
-        context.fillStyle = shapeColors[i];
-      }
-      //drawShape(shapes[i]);
-      //context.fillStyle = shapeColors[i];
+      if (patterns) context.fillStyle = createPat(shapeColors[i], i, i);
+      else context.fillStyle = shapeColors[i];
       let alpha = alphaValues[i];
       drawShape(shapes[i], alpha);
     }
@@ -331,11 +298,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
       return pattern;
     }
-
   }
-
-
-
 
   function clickEffect(x, y, color) {
     var d = document.createElement("div");
@@ -375,10 +338,20 @@ document.addEventListener("DOMContentLoaded", function() {
       socket.emit('new_click', mouse.pos, curColor, currentAlpha); // Send point to the server
       mouse.click = false;
     }
+
     //Allows recharge bar to show current status
     updateRechargeBar();
+
     // Check if user has changed the size of their browser window
     if (window.innerWidth != width || window.innerHeight * CANVAS_HEIGHT != height) drawAll();
+
+    // Check if user has toggled patterns.
+    var checkbox = document.querySelector('input[type="checkbox"]');
+    if ((checkbox.checked && !patterns) || (!checkbox.checked && patterns)) {
+      patterns = !patterns;
+      drawAll();
+    } 
+
     setTimeout(mainLoop, 30);
   }
   mainLoop();
