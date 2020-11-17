@@ -212,6 +212,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Pass the read json file from the server to the popup.js function
     // This will populate the gallery section of the popup window
     populateGallery(galleryJson);
+    console.log('Pop class');
   });
 
   // Helper functions for making the actual UI changes

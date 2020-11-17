@@ -69,21 +69,22 @@
         <div class="button" onclick="onColorClick(colors[7]);updateSelectedColor(this)"></div>
         <div class="button" onclick="onColorClick(colors[8]);updateSelectedColor(this)"></div>
         <div class="button" onclick="onColorClick(colors[9]);updateSelectedColor(this)"></div>
-
-      </div>
-
-      <div id="bar-info">
+      </div
+      ><div id="bar-info">
         <input id="transparent" type="range" min="0" max="100" value="0" class="slider">
         <p id="trans-amount">Transparency: 0%</p>
         <div class="myBar label-center"></div>
-      </div>
-      <div id="reset-timer-div">
+      </div
+      ><div id="reset-timer-div">
         <span>
           <h4><u>Reset Timer</u></h4>
           <p id='reset-timer'>00:00:00</p>
         </span>
-      </div>
-      <div id="question-mark">
+      </div
+      ><div id="gallery-mark" class="circle-button">
+        <img src="./img/galleryMark.png" alt="Gallery Mark">
+      </div
+      ><div id="question-mark" class="circle-button">
         <img src="./img/questionMark.png" alt="Question Mark">
       </div>
     </div>
@@ -93,9 +94,43 @@
 
 
   <div id="popup-shadow" class="hidden"></div>
+  <div id="gallery-popup" class='hidden'>
+    <div id="gallery-popup-header">
+      <p>Gallery</p>
+    </div>
 
-  <div id="popup" class="hidden">
+    <div id="gallery-div">
+      <p class="gallery-left">Most Recent</p>
+      <p class="gallery-right">Least Recent</p>
+      <div id="gallery-grid-wrap">
+        <span id="cell1" class="hidden">
+          <img src="#" alt="Img 1"><br>
+          <p>Date</p>
+        </span>
+        <span id="cell2" class="hidden">
+          <img src="#" alt="Img 2"><br>
+          <p>Date</p>
+        </span>
+        <span id="cell3" class="hidden">
+          <img src="#" alt="Img 3"><br>
+          <p>Date</p>
+        </span>
+        <span id="cell4" class="hidden">
+          <img src="#" alt="Img 4"><br>
+          <p>Date</p>
+        </span>
+        <span id="cell5" class="hidden">
+          <img src="#" alt="Img 5"><br>
+          <p>Date</p>
+        </span>
+      </div>
+    </div>
+  </div>
 
+  <div id="enlarged-image-shadow" class="hidden"></div>
+  <img id="enlarged-image" src="./img/gallery/Entry1.png" alt="Enlarged Image" class="hidden">
+
+  <div id="help-popup" class="hidden">
     <div id="popup-header">
       <p>Information</p>
     </div>
@@ -104,7 +139,6 @@
       <ul id="popup-list">
         <li class="popup-selected">Intro</li>
         <li>Mechanics</li>
-        <li>Gallery</li>
       </ul>
     </div>
 
@@ -130,36 +164,16 @@
           <li>After a user's click, there is a 6 second cooldown until that user can make another move. In that time, other players can move the line in a different direction.</li>
           <li>If a user's click results in an intersection with the line's existing body, the shape made will be filled in with the user's pre-chosen color</li>
           <li>With the color bar, a user can choose a fill-in color. This color can be changed at any time, but will not affect shapes that have already been created.</li>
-          <li>The canvas is reset every 2 days, at which point the canvas will be screenshotted and kept in a gallery for 10 days (gallery is found on the third tab of this popup). After the 10 days, the work will be deleted, so manually save any
-            works that interest you.</li>
+          <li>The gallery can be found through the button right next to the infromation menu button.</li>
+          <li>The canvas is reset every 2 days, at which point the canvas will be screenshotted and kept in a gallery for 10 days. After the 10 days, the work will be deleted, so manually save any
+          works that interest you.</li>
+          <li>Press 'a' on your keyboard to animate all shapes and redraw them in the order that they were drawn by the users.</li>
+          <li>Press 'h' to hide the path being drawn. Useful for taking screenshots!</li>
         </ul>
         <br>
       </div>
 
-      <div id="gallery-div" class="hidden">
-        <div id="grid-wrap">
-          <span id="cell1" class="hidden">
-            <img src="#" alt="Img 1"><br>
-            <p>Date</p>
-          </span>
-          <span id="cell2" class="hidden">
-            <img src="#" alt="Img 2"><br>
-            <p>Date</p>
-          </span>
-          <span id="cell3" class="hidden">
-            <img src="#" alt="Img 3"><br>
-            <p>Date</p>
-          </span>
-          <span id="cell4" class="hidden">
-            <img src="#" alt="Img 4"><br>
-            <p>Date</p>
-          </span>
-          <span id="cell5" class="hidden">
-            <img src="#" alt="Img 5"><br>
-            <p>Date</p>
-          </span>
-        </div>
-      </div>
+
     </div>
 
   </div>

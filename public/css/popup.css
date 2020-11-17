@@ -2,11 +2,6 @@
     display: none !important;
 }
 
-/* 
-============================================
-Information Popup box
-============================================
-*/
 div#popup-shadow {
     position: fixed;
     height: 100%;
@@ -14,9 +9,147 @@ div#popup-shadow {
     top: 0%;
     left: 0%;
     background-color: rgba(107, 107, 107, 0.301);
-  }
+}
 
-div#popup {
+/* 
+============================================
+Gallery Popup box
+============================================
+*/
+div#gallery-popup {
+    width: 60%;
+    min-width: 400px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    background-color: rgb(78, 78, 78);
+    border-color: rgb(34, 34, 34);
+    box-sizing: border-box;
+    border-style: double;
+    border-width: 6px;
+    border-radius: 40px;
+
+    font-family: sans-serif;
+}
+
+div#gallery-popup-header {
+    float: left;
+    width: 100%;
+    height: 40px;
+    font-size: 34px;
+    line-height: 22px;
+    text-align: center;
+    background-color: rgb(247, 139, 51);
+    border-top-left-radius: 32px;
+    border-top-right-radius: 32px;
+    border-bottom: solid;
+    border-color: black;
+}
+
+div#gallery-popup-header p {
+    padding: 0;
+    margin: 6px;
+}
+
+div#gallery-div {
+    float: left;
+    width: calc(100% - 20px);
+    height: calc(100% - 40px - 24px);
+    overflow: auto;
+    text-align: center;
+    margin-bottom: 15px;
+    margin-left: 10px;
+}
+
+div#gallery-grid-wrap {
+    width: 100%;
+    margin-top: 1vh;
+    display: grid;
+    grid-template-columns: 20% 20% 20% 20% 20%;
+    text-align: center;
+}
+
+div#gallery-div span{
+    background-color: rgb(214, 214, 214);
+    box-sizing: border-box;
+    border-style: solid;
+    border-color: black;
+    border-width: 2px;
+    border-radius: 5px;
+}
+
+div#gallery-div span:hover{
+    background-color: rgb(252, 156, 156);
+}
+
+div#gallery-div span img{
+    width: 75%;
+    margin-top: 3%;
+    box-shadow: 0 4px 4px -1px rgba(0, 0, 0, 0.4);
+}
+
+div#gallery-div span p {
+    margin: 0;
+}
+
+.gallery-left {
+    color: white;
+    float: left;
+    margin-left: 15px;
+}
+
+.gallery-right {
+    color: white;
+    float: right;
+    margin-right: 15px;
+}
+
+
+/* 
+============================================
+Enlarged Image
+============================================
+*/
+div#enlarged-image-shadow {
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    top: 0%;
+    left: 0%;
+    background-color: rgba(107, 107, 107, 0.747);
+}
+
+img#enlarged-image {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 90%;
+    max-height: 90%;
+}
+
+/* 
+============================================
+Information Popup box
+============================================
+*/
+/* Popup header */
+div#popup-header {
+    float: left;
+    width: 100%;
+    height: 34px;
+    font-size: 22px;
+    line-height: 22px;
+    text-align: center;
+}
+
+div#popup-header p {
+    padding: 0;
+    margin: 6px;
+}
+div#help-popup {
     height: 80%;
     width: 30%;
     min-width: 350px;
@@ -37,22 +170,7 @@ div#popup {
     overflow: auto;
 }
 
-/* Popup-header */
-div#popup-header {
-    float: left;
-    width: 100%;
-    height: 34px;
-    font-size: 22px;
-    line-height: 22px;
-    text-align: center;
-}
-
-div#popup-header p {
-    padding: 0;
-    margin: 6px;
-}
-
-/* Popup-buttons */
+/* Popup buttons */
 div#popup-buttons {
     float: left;
     width: 100%;
@@ -72,7 +190,7 @@ ul#popup-list {
 
 ul#popup-list li {
     float: left;
-    width: calc(100% / 3);
+    width: calc(100% / 2);
     height: 100%;
     display: block;
     box-sizing: border-box;
@@ -117,34 +235,4 @@ div#popup-information ul li {
 
 div#popup-help-div p{
     margin-bottom: 8px;
-}
-
-div#grid-wrap {
-    width: 100%;
-    margin-top: 1vh;
-    display: grid;
-    grid-template-columns: 49% 49%;
-    column-gap: 1%;
-    row-gap: 10px;
-}
-
-div#gallery-div span:hover{
-    background-color: red;
-}
-
-span#cell1 {
-    width: 50%;
-    justify-self: center;
-    grid-column-start: 1;
-    grid-column-end: 3;
-}
-
-div#gallery-div span img{
-    width: 75%;
-    margin-top: 3%;
-    box-shadow: 0 4px 4px -1px rgba(0, 0, 0, 0.4);
-}
-
-div#gallery-div span p{
-    margin: 0;
 }
