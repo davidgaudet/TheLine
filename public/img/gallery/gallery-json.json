@@ -1,5 +1,5 @@
 {
-    "files_to_load": 2,
+    "files_to_load": 3,
     "file_1": {
         "file_name": "Conor.jpg",
         "date_added": "August 12th, 2020"
@@ -7,5 +7,9 @@
     "file_2": {
         "file_name": "Emily.png",
         "date_added": "August 10th, 2020"
+    },
+    "file_3": {
+        "file_name": "David.jpg",
+        "date_added": "November 18th, 2020"
     }
 }

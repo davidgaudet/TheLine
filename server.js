@@ -89,7 +89,7 @@ io.on('connection', function(socket) {
     }, 1000);
   }
 
-  // newGalleryEntry(socket, 'Emily.png', 'August 12th, 2020');
+  //newGalleryEntry(socket, 'David.png', 'November 18th, 2020');
   checkGalleryJson(socket);
 });
 
