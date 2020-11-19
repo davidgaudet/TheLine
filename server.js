@@ -1,4 +1,4 @@
-// Server code
+// Server code.
 let express = require('express'),
   app = express(),
   http = require('http'),
