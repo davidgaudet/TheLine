@@ -84,7 +84,20 @@ io.on('connection', function(socket) {
       io.sockets.emit('reset_counter', timerCount);
       timerCount--;
       if (timerCount == -1) {
-        clearInterval(this);
+        // State info
+        path = [{
+          x: 0.5,
+          y: 0.5
+        }, {
+          x: 0.501,
+          y: 0.501
+        }];
+        shapes = [];
+        colors = [];
+        alphas = [];
+
+        timerCount = defaultCount;
+        io.sockets.emit('clear_canvas');
       }
     }, 1000);
   }

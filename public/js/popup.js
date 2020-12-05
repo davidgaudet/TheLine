@@ -1,12 +1,12 @@
 var gallery_json = null;
 
 $(document).ready(function(){
-    // Gallery mark button, handle click
+    // Gallery button, handle click
     $(document).on({
         click: function(){
             showGalleryPopup();
         }
-    }, 'div#gallery-mark img');
+    }, 'div#menu-gallery-div');
 
     // Detected mouse click on an image in the gallery
     $(document).on({
@@ -18,12 +18,12 @@ $(document).ready(function(){
         }
     }, 'div#gallery-div span');
 
-    // Question mark button, handle click
+    // Help button, handle click
     $(document).on({
         click: function(){
             showHelpPopup();
         }
-    }, 'div#question-mark img');
+    }, 'div#menu-help-div');
 
     // Detect when one of the list elements in the popup box is hovered over
     $(document).on({

@@ -42,8 +42,9 @@ header {
 }
 
 .myBar {
-  margin-top: -15%;
-  transform: translate(0%, 15%);
+  float: left;
+  margin-top: -10px;
+  margin-left: -12px;
   overflow: hidden;
 }
 
@@ -100,7 +101,7 @@ canvas {
 #project-info {
   display: inline-block;
   position: relative;
-  width: calc((100% - 290px) * 0.25);
+  width: calc((100% - 370px) * 0.35);
 }
 
 #project-info span {
@@ -113,12 +114,19 @@ canvas {
 #color-buttons {
   display: inline-block;
   vertical-align: middle;
-  overflow-x: auto;
-  overflow-y: hidden;
+
   white-space: nowrap;
   text-align: center;
-  width: calc((100% - 290px) * 0.75);
+  width: calc((100% - 370px) * 0.65);
   height: 100%;
+}
+
+#color-buttons-right-div {
+  float: left;
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .button {
@@ -126,7 +134,7 @@ canvas {
   display: inline-block;
   left: auto;
   height: 100%;
-  width: 9%;
+  width: calc(10% - 1px);
   border-style: double;
   border-color: black;
   border-radius: 4px;
@@ -146,13 +154,27 @@ canvas {
   cursor: pointer;
 }
 
+#pattern-label {
+  float: left;
+  line-height: 26px;
+  margin-top: 4px;
+  margin-right: 10px;
+}
+
+#pattern-holder {
+  float: left;
+  width: 50px;
+  height: 26px;
+  margin-top: 4px;
+}
 
 .switch {
+  float: left;
   position: relative;
   display: inline-block;
-  width: 60px;
-  height: 35px;
-  /* padding: 10px; */
+  width: 50px;
+  height: 26px;
+  margin-top: 2px;
 }
 .switch input {display:none;}
 .slider2 {
@@ -165,15 +187,14 @@ canvas {
   background-color: #ccc;
   -webkit-transition: .4s;
   transition: .4s;
-  /* padding: 5px; */
 }
 .slider2:before {
   position: absolute;
   content: "";
-  height: 26px;
-  width: 26px;
+  height: 20px;
+  width: 20px;
   left: 4px;
-  bottom: 4px;
+  bottom: 3px;
   background-color: white;
   -webkit-transition: .4s;
   transition: .4s;
@@ -186,11 +207,11 @@ input:focus + .slider2 {
 }
 
 input:checked + .slider2:before {
-  -webkit-transform: translateX(25px);
-  -ms-transform: translateX(25px);
-  -moz-transform: translateX(25px);
-  -o-transform: translateX(25px);
-  transform: translateX(25px);
+  -webkit-transform: translateX(21px);
+  -ms-transform: translateX(21px);
+  -moz-transform: translateX(21px);
+  -o-transform: translateX(21px);
+  transform: translateX(21px);
 }
 
 
@@ -203,44 +224,64 @@ input:checked + .slider2:before {
 
 #bar-info {
   cursor: default;
-  width: 120px;
+  width: 124px;
   height: 100%;
   overflow: hidden !important;
   vertical-align: middle;
   display: inline-block;
+  text-align: center;
+  margin-left: 13px;
 }
 
-#reset-timer-div {
-  font-size: 16px;
+#cooldown-holder {
+  position: absolute;
+  top: 40px;
+  left: 28px;
+  text-align: center;
+}
+
+#menu-buttons-div {
   display: inline-block;
   position: relative;
-  width: 90px;
-}
-
-#reset-timer-div span {
-  cursor: default;
-  margin-left: -10px;
-  display: inline-block;
+  width: 225px;
+  margin-left: 8px;
+  height: 100%;
   vertical-align: middle;
-  text-align: center;
-  width: calc(100% + 10px);
+  overflow: auto;
 }
 
-.circle-button {
-  width: 40px;
+.left-menu {
+  float: left;
+  width: 96px;
   height: 100%;
   text-align: center;
-  display: inline-block;
+  overflow: hidden;
 }
 
-.circle-button img {
-  width: 95%;
-  vertical-align: middle;
+.right-menu {
+  float: right;
+  width: calc(100% - 100px);
+  height: calc(100% / 3);
+  min-height: 12px;
+  border-style: solid;
+  border-width: 2px;
+  text-align: center;
+  margin-left: 4px;
 }
 
-.circle-button img:hover {
-  background-color: gray;
-  border-radius: 100%;
+.menu-clickable {
+  background-color: rgb(71, 71, 71);
+}
+
+.menu-clickable:hover {
+  background-color: rgb(219, 115, 40);
+  cursor: pointer;
+}
+
+#menu-reset-timer-div {
+  font-size: 14px;
+  border-style: none;
+  box-sizing: none;
 }
 
 #user-count {
@@ -249,11 +290,11 @@ input:checked + .slider2:before {
 
 #transparent {
   width: 100%;
-  float: middle;
 }
 
 #trans-amount {
   font-size: 10px;
+  margin: 0;
 }
 
 @media (max-width: 600px) {

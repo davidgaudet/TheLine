@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function() {
   const HEADER_HEIGHT = 0.1;
   const CANVAS_HEIGHT = 0.9;
   const COOLDOWN_MINIMUM = 850;
-  const COOLDOWN_PER_USER = 150; // Increases by 100 ms per new user
+  const COOLDOWN_PER_USER = 150; // Increases by 150 ms per new user
   let current_cooldown = 1000; // Changes as user count increases / decreases
   let user_count = 1;
   let moveTime = 0; // Clock time when user send a move to the server
@@ -135,6 +135,7 @@ document.addEventListener("DOMContentLoaded", function() {
   socket.on('user_count_changed', function(userCount) {
     user_count = userCount;
     document.getElementById("user-count").innerHTML = "Active Users: " + userCount;
+    $('#cooldown-holder').text( ((COOLDOWN_MINIMUM + COOLDOWN_PER_USER * user_count) / 1000).toFixed(2) + 's');
   });
 
   // Draw everything (from scratch)
@@ -199,12 +200,18 @@ document.addEventListener("DOMContentLoaded", function() {
     hours = hours < 10 ? "0" + hours : hours;
     minutes = minutes < 10 ? "0" + minutes : minutes;
     seconds = seconds < 10 ? "0" + seconds : seconds;
-    $('p#reset-timer').text(hours + ":" + minutes + ":" + seconds);
+    $('p#reset-timer').text("Reset - " + hours + ":" + minutes + ":" + seconds);
 
     if (timerCount < 300) {
       var color = timerCount % 2 ? 'white' : 'red';
-      $('div#reset-timer-div span').css('color', color);
+      $('div#menu-reset-timer-div p').css('color', color);
     }
+  });
+
+  // Handle the reset timer running out, reload page
+  socket.on('clear_canvas', function() {
+    // Reload page to mirror that shapes and path have been reset
+    location.reload();
   });
 
   socket.on('gallery_json_loaded', function(jsonString) {
@@ -212,7 +219,6 @@ document.addEventListener("DOMContentLoaded", function() {
     // Pass the read json file from the server to the popup.js function
     // This will populate the gallery section of the popup window
     populateGallery(galleryJson);
-    console.log('Pop class');
   });
 
   // Helper functions for making the actual UI changes
@@ -314,7 +320,7 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   //handles transparency toggler
-  document.getElementById('transparent').onclick = function transparancyToggler() {
+  document.getElementById('transparent').oninput = function transparancyToggler() {
     var result = document.getElementById("transparent").value;
     currentAlpha = result / 100;
     currentAlpha = 1.01 - currentAlpha;

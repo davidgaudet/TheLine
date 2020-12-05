@@ -55,45 +55,52 @@
         </span>
       </div
       ><div id="color-buttons">
-        <label class="switch">
-          <input type="checkbox">
-          <span class="slider2"></span>
-        </label>
-        <div class="button" onclick="onColorClick(colors[0]);updateSelectedColor(this)"></div>
-        <div class="button" onclick="onColorClick(colors[1]);updateSelectedColor(this)"></div>
-        <div class="button" onclick="onColorClick(colors[2]);updateSelectedColor(this)"></div>
-        <div class="button" onclick="onColorClick(colors[3]);updateSelectedColor(this)"></div>
-        <div class="button" onclick="onColorClick(colors[4]);updateSelectedColor(this)"></div>
-        <div class="button" onclick="onColorClick(colors[5]);updateSelectedColor(this)"></div>
-        <div class="button" onclick="onColorClick(colors[6]);updateSelectedColor(this)"></div>
-        <div class="button" onclick="onColorClick(colors[7]);updateSelectedColor(this)"></div>
-        <div class="button" onclick="onColorClick(colors[8]);updateSelectedColor(this)"></div>
-        <div class="button" onclick="onColorClick(colors[9]);updateSelectedColor(this)"></div>
+        <div id="color-buttons-right-div">
+          <div class="button selected-color" onclick="onColorClick(colors[0]);updateSelectedColor(this)"></div>
+          <div class="button" onclick="onColorClick(colors[1]);updateSelectedColor(this)"></div>
+          <div class="button" onclick="onColorClick(colors[2]);updateSelectedColor(this)"></div>
+          <div class="button" onclick="onColorClick(colors[3]);updateSelectedColor(this)"></div>
+          <div class="button" onclick="onColorClick(colors[4]);updateSelectedColor(this)"></div>
+          <div class="button" onclick="onColorClick(colors[5]);updateSelectedColor(this)"></div>
+          <div class="button" onclick="onColorClick(colors[6]);updateSelectedColor(this)"></div>
+          <div class="button" onclick="onColorClick(colors[7]);updateSelectedColor(this)"></div>
+          <div class="button" onclick="onColorClick(colors[8]);updateSelectedColor(this)"></div>
+          <div class="button" onclick="onColorClick(colors[9]);updateSelectedColor(this)"></div>
+        </div>
       </div
       ><div id="bar-info">
         <input id="transparent" type="range" min="0" max="100" value="0" class="slider">
         <p id="trans-amount">Transparency: 0%</p>
-        <div class="myBar label-center"></div>
+        <p id="pattern-label">Texture</p>
+        <div id="pattern-holder">
+          <label class="switch">
+            <input type="checkbox">
+            <span class="slider2"></span>
+          </label>
+        </div>
       </div
-      ><div id="reset-timer-div">
-        <span>
-          <h4><u>Reset Timer</u></h4>
-          <p id='reset-timer'>00:00:00</p>
-        </span>
-      </div
-      ><div id="gallery-mark" class="circle-button">
-        <img src="./img/galleryMark.png" alt="Gallery Mark">
-      </div
-      ><div id="question-mark" class="circle-button">
-        <img src="./img/questionMark.png" alt="Question Mark">
+      ><div id='menu-buttons-div'>
+        <div class="left-menu">
+          <div class="myBar label-center"></div>
+          <p id='cooldown-holder'></p>
+        </div>
+        
+        <div id='menu-help-div' class='right-menu menu-clickable'><strong>Help</strong></div>
+
+
+        <div id='menu-gallery-div' class='right-menu menu-clickable'><strong>Gallery</strong></div>
+
+        <div id='menu-reset-timer-div' class="right-menu">
+          <strong><p id='reset-timer'>Reset - 00:00:00</p></strong>
+        </div>
       </div>
     </div>
 
   </header>
+
   <canvas id="drawing"></canvas>
 
-
-  <div id="popup-shadow" class="hidden"></div>
+  <div id="popup-shadow"></div>
   <div id="gallery-popup" class='hidden'>
     <div id="gallery-popup-header">
       <p>Gallery</p>
@@ -130,7 +137,7 @@
   <div id="enlarged-image-shadow" class="hidden"></div>
   <img id="enlarged-image" src="./img/gallery/Entry1.png" alt="Enlarged Image" class="hidden">
 
-  <div id="help-popup" class="hidden">
+  <div id="help-popup">
     <div id="popup-header">
       <p>Information</p>
     </div>
@@ -152,6 +159,7 @@
           The canvas will not be up indefinitely, however. The canvas will be wiped periodically to avoid clutter over time, after which it will be blank and ready for a fresh art piece to be created.
         </p>
         <h2>Have fun!</h2>
+        <p>(Click outside this popup to close it)</p>
       </div>
 
       <div id="popup-help-div" class="hidden">
@@ -161,15 +169,15 @@
         </p>
         <ul>
           <li>Clicking on the canvas will cause the line to move toward the position of that user's click.</li>
-          <li>After a user's click, there is a 6 second cooldown until that user can make another move. In that time, other players can move the line in a different direction.</li>
-          <li>If a user's click results in an intersection with the line's existing body, the shape made will be filled in with the user's pre-chosen color</li>
+          <li>After a user's click, there is a cooldown until that user can make another move. The cooldown is based on the number of connected players. In that time, other players can move the line in a different direction.</li>
+          <li>If a user's click results in an intersection with the line's existing body, the shape made will be filled in with the user's pre-chosen color.</li>
           <li>With the color bar, a user can choose a fill-in color. This color can be changed at any time, but will not affect shapes that have already been created.</li>
-          <li>The gallery can be found through the button right next to the infromation menu button.</li>
-          <li>The canvas is reset every 2 days, at which point the canvas will be screenshotted and kept in a gallery for 10 days. After the 10 days, the work will be deleted, so manually save any
-          works that interest you.</li>
-          <li>Press 'a' on your keyboard to animate all shapes and redraw them in the order that they were drawn by the users.</li>
-          <li>Press 'h' to hide the path being drawn. Useful for taking screenshots!</li>
+          <li>Press <strong><u>'a'</u></strong> on your keyboard to animate all shapes and redraw them in the order that they were drawn by the users.</li>
+          <li>Press <strong><u>'h'</u></strong> to hide the path being drawn. Useful for taking screenshots!</li>
+          <li>The gallery can be found through the button in the top right corner of the screen, titled "Gallery". Here, you can see some curated screenshots of works created with the tool.</li>
+          <li>The canvas is reset every 2 days, where all shapes will be deleted and the path reset.</li>
         </ul>
+        <p>(Click outside this popup to close it)</p>
         <br>
       </div>
 
